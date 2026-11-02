@@ -1,0 +1,131 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Controls Header -->
+<div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+  <div class="flex items-center gap-3 w-full md:w-auto">
+    <div class="relative flex-1 md:w-80">
+      <input type="text" id="user-search" oninput="filterUsers()" placeholder="Search users by name or email..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 pl-9">
+      <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    </div>
+    <select id="user-role-filter" onchange="filterUsers()" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none">
+      <option value="">All Roles</option>
+      <option value="admin">Admin</option>
+      <option value="customer">Customer</option>
+    </select>
+  </div>
+
+  <a href="{{ url_for('admin.admin_user_add') }}" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-xs shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-teal-500 transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+    <span>Add New User</span>
+  </a>
+</div>
+
+<!-- User Data Table -->
+<div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-xs" id="user-table">
+      <thead>
+        <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+          <th class="py-3 px-4">Id</th>
+          <th class="py-3 px-4">Profile</th>
+          <th class="py-3 px-4">Username</th>
+          <th class="py-3 px-4">Password</th>
+          <th class="py-3 px-4">Role</th>
+          <th class="py-3 px-4">Status</th>
+          <th class="py-3 px-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800/60 text-slate-300" id="user-table-body">
+        {% for u in users %}
+        <tr class="hover:bg-slate-800/40 transition user-row" data-name="{{ u.name|lower }}" data-email="{{ u.email|lower }}" data-role="{{ u.role|lower }}">
+          <!-- 1. Id -->
+          <td class="py-3.5 px-4 font-mono text-slate-400">
+            #{{ u.id }}
+          </td>
+
+          <!-- 2. Profile -->
+          <td class="py-3.5 px-4">
+            {% if u.image %}
+            <img src="{{ u.image }}" alt="{{ u.name }}" class="w-9 h-9 rounded-full object-cover border border-slate-700 shadow shrink-0">
+            {% else %}
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr {% if u.role == 'Admin' %}from-violet-600 to-indigo-600{% else %}from-blue-600 to-teal-500{% endif %} flex items-center justify-center font-bold text-white text-xs shrink-0 shadow user-avatar">{{ u.avatar }}</div>
+            {% endif %}
+          </td>
+
+          <!-- 3. Username -->
+          <td class="py-3.5 px-4">
+            <p class="font-semibold text-white user-name">{{ u.name }}</p>
+            <p class="text-[11px] text-slate-400 user-email">{{ u.email }}</p>
+          </td>
+
+          <!-- 4. Password -->
+          <td class="py-3.5 px-4">
+            <div class="flex items-center gap-1.5 font-mono text-xs text-slate-400">
+              <span class="tracking-widest">••••••••</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700/60 text-slate-400 font-sans">Encrypted</span>
+            </div>
+          </td>
+
+          <!-- 5. Role -->
+          <td class="py-3.5 px-4">
+            {% if u.role == 'Admin' %}
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20 user-role">Admin</span>
+            {% else %}
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 user-role">Customer</span>
+            {% endif %}
+          </td>
+
+          <!-- 6. Status -->
+          <td class="py-3.5 px-4">
+            {% if u.status == 'Active' %}
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 user-status">Active</span>
+            {% else %}
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 user-status">Inactive</span>
+            {% endif %}
+          </td>
+
+          <!-- 7. Actions -->
+          <td class="py-3.5 px-4 text-right">
+            <div class="flex items-center justify-end gap-1.5">
+              <a href="{{ url_for('admin.admin_user_edit', user_id=u.id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition" title="Edit User">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </a>
+              <form action="{{ url_for('admin.admin_user_delete', user_id=u.id) }}" method="POST" class="inline-flex items-center m-0" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer" title="Delete User">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function filterUsers() {
+  const searchInput = document.getElementById('user-search');
+  const roleSelect = document.getElementById('user-role-filter');
+  if (!searchInput) return;
+
+  const query = searchInput.value.toLowerCase().trim();
+  const role = roleSelect ? roleSelect.value.toLowerCase().trim() : '';
+  const rows = document.querySelectorAll('.user-row');
+
+  rows.forEach(row => {
+    const name = (row.getAttribute('data-name') || '').toLowerCase();
+    const email = (row.getAttribute('data-email') || '').toLowerCase();
+    const userRole = (row.getAttribute('data-role') || '').toLowerCase();
+
+    const matchesQuery = !query || name.includes(query) || email.includes(query);
+    const matchesRole = !role || userRole === role;
+
+    row.style.display = (matchesQuery && matchesRole) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

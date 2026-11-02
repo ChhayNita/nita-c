@@ -1,0 +1,22 @@
+{% extends "front/base.html" %}
+
+{% block content %}
+  <section class="container section">
+    <div class="form-panel">
+      <div class="eyebrow">Account</div>
+      <h2>My account</h2>
+      {% if current_user %}
+        <p><strong>Name:</strong> {{ current_user.name }}</p>
+        <p><strong>Email:</strong> {{ current_user.email }}</p>
+        <form method="post" action="{{ url_for('user.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit">Logout</button>
+        </form>
+      {% else %}
+        <p>Please login or create an account.</p>
+        <a class="button" href="{{ url_for('user.login') }}">Login</a>
+        <a class="button secondary" href="{{ url_for('user.register') }}">Create user</a>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "front/base.html" %}
+
+{% block content %}
+  <section class="container section">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Shopping cart</div>
+        <h2>Your cart</h2>
+      </div>
+    </div>
+
+    {% if items %}
+      {% for item in items %}
+        <div class="cart-row">
+          <img src="{{ item.product.image }}" alt="{{ item.product.title }}">
+          <div>
+            <strong>{{ item.product.title }}</strong>
+            <p>${{ "%.2f"|format(item.product.discounted_price) }} each</p>
+          </div>
+          <form class="qty-form" method="post" action="{{ url_for('user.update_cart', product_id=item.product.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button name="action" value="minus" type="submit">-</button>
+            <button class="secondary" disabled>{{ item.quantity }}</button>
+            <button name="action" value="plus" type="submit">+</button>
+            <button name="action" value="remove" type="submit">Remove</button>
+          </form>
+          <strong>${{ "%.2f"|format(item.subtotal) }}</strong>
+        </div>
+      {% endfor %}
+
+      <div class="total-box">
+        <h2>Total: ${{ "%.2f"|format(total) }}</h2>
+        <div class="cart-actions">
+          <a class="button" href="{{ url_for('user.checkout') }}">Checkout</a>
+          <form method="post" action="{{ url_for('user.clear_cart') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="secondary" type="submit">Empty Cart</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <p>Your cart is empty.</p>
+      <a class="button" href="{{ url_for('user.products') }}">Shop products</a>
+    {% endif %}
+  </section>
+{% endblock %}

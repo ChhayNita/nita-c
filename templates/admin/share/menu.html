@@ -37,6 +37,45 @@
         <span>Categories</span>
       </a>
 
+      <!-- Orders Dropdown Menu -->
+      <div class="space-y-1">
+        <button type="button" onclick="toggleOrderMenu()" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium {% if active_page == 'orders' %}active-nav-link text-blue-400{% else %}text-slate-400 hover:text-white hover:bg-slate-800/60{% endif %} transition-all group">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            <span>Orders</span>
+          </div>
+          <svg id="order-arrow" class="w-4 h-4 text-slate-400 group-hover:text-white transition-transform duration-200 {% if active_page == 'orders' %}rotate-180{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <div id="order-submenu" class="pl-7 pr-2 space-y-1 {% if active_page != 'orders' %}hidden{% endif %} transition-all">
+          <a href="{{ url_for('admin.admin_orders') }}" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium {% if active_subpage == 'all' %}text-blue-400 bg-blue-500/10 font-semibold{% else %}text-slate-400 hover:text-white hover:bg-slate-800/40{% endif %} transition">
+            <span>All Orders</span>
+          </a>
+          <a href="{{ url_for('admin.admin_orders_pickup') }}" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium {% if active_subpage == 'pickup' %}text-amber-400 bg-amber-500/10 font-semibold{% else %}text-slate-400 hover:text-white hover:bg-slate-800/40{% endif %} transition">
+            <span class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              Pickup
+            </span>
+          </a>
+          <a href="{{ url_for('admin.admin_orders_khqr') }}" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium {% if active_subpage == 'khqr' %}text-rose-400 bg-rose-500/10 font-semibold{% else %}text-slate-400 hover:text-white hover:bg-slate-800/40{% endif %} transition">
+            <span class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+              Pay with KHQR
+            </span>
+          </a>
+          <a href="{{ url_for('admin.admin_orders_delivery') }}" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium {% if active_subpage == 'delivery' %}text-emerald-400 bg-emerald-500/10 font-semibold{% else %}text-slate-400 hover:text-white hover:bg-slate-800/40{% endif %} transition">
+            <span class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Delivery
+            </span>
+          </a>
+        </div>
+      </div>
+
       <!-- Users Tab Link -->
       <a href="{{ url_for('admin.admin_users') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium {% if active_page == 'user' %}active-nav-link text-blue-400{% else %}text-slate-400 hover:text-white hover:bg-slate-800/60{% endif %} transition-all">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>

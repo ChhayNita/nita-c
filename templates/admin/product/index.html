@@ -49,13 +49,11 @@
           <tr class="hover:bg-slate-800/40 transition product-row" data-title="{{ p.name|lower }}" data-category="{{ (p.category.name if p.category else '')|lower }}">
             <td class="py-3.5 px-4 flex items-center gap-3">
               {% if p.thumbnail %}
-                <img src="{{ p.thumbnail }}" alt="{{ p.name }}" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">
+                <img src="{{ p.thumbnail }}" alt="{{ p.name }}" onerror="this.onerror=null;this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png';" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">
               {% elif p.images %}
-                <img src="{{ p.images[0].name }}" alt="{{ p.name }}" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">
+                <img src="{{ p.images[0].name }}" alt="{{ p.name }}" onerror="this.onerror=null;this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png';" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">
               {% else %}
-                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-500 shrink-0 text-[10px]">
-                  No Img
-                </div>
+                <img src="https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png" alt="No Image" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">
               {% endif %}
               <div class="max-w-xs">
                 <p class="font-medium text-white truncate text-xs product-title">{{ p.name }}</p>

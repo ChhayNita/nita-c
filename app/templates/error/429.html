@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>429 Limit Exceeded | SV7 Store</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          animation: {
+            'pop-in': 'popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            'pulse-amber': 'pulseAmber 2s ease-in-out infinite',
+          },
+          keyframes: {
+            popIn: {
+              '0%': { transform: 'scale(0.9) translateY(10px)', opacity: '0' },
+              '100%': { transform: 'scale(1) translateY(0)', opacity: '1' },
+            },
+            pulseAmber: {
+              '0%, 100%': { opacity: '0.4' },
+              '50%': { opacity: '0.9' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    .modal-glass-card {
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 50px -5px rgba(245, 158, 11, 0.3);
+    }
+  </style>
+</head>
+<body class="h-full antialiased font-sans flex items-center justify-center min-h-screen relative overflow-hidden bg-slate-950/95 selection:bg-amber-500 selection:text-white">
+
+  <!-- Locked Screen Backdrop Overlay (Prevents interactions behind modal) -->
+  <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-40"></div>
+
+  <!-- Popup Modal Window -->
+  <div class="relative z-50 w-full max-w-md px-4 sm:px-6">
+    <div class="modal-glass-card rounded-3xl p-7 sm:p-8 text-center animate-pop-in relative">
+      
+      <!-- Warning Icon Badge -->
+      <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-tr from-amber-600 via-orange-500 to-yellow-400 p-0.5 shadow-xl shadow-amber-500/30 flex items-center justify-center">
+        <div class="w-full h-full rounded-[14px] bg-slate-900 flex items-center justify-center text-amber-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Popup Header -->
+      <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">
+        429 Rate Limit Exceeded
+      </h2>
+      
+      <!-- Popup Message -->
+      <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+        You have submitted too many requests in a short period. Access is temporarily locked to protect system security.
+      </p>
+
+      <!-- Timer & Progress Status -->
+      <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 mb-6 text-left space-y-2">
+        <div class="flex items-center justify-between text-xs font-semibold text-amber-300">
+          <span class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            Cooldown Active
+          </span>
+          <span id="timer-text" class="font-mono text-amber-400 text-sm">30s</span>
+        </div>
+        <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Disabled Lock Info Note -->
+      <div class="flex items-center justify-center gap-2 text-xs text-slate-400 font-medium">
+        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+        <span>Automatic unlock when timer reaches 0s</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Live Countdown Script with Auto-Redirect/Unlock
+    let totalSeconds = 30;
+    let secondsLeft = totalSeconds;
+    const timerText = document.getElementById('timer-text');
+    const progressBar = document.getElementById('progress-bar');
+
+    const countdownInterval = setInterval(() => {
+      secondsLeft--;
+      if (timerText) timerText.textContent = secondsLeft + 's';
+      if (progressBar) progressBar.style.width = ((secondsLeft / totalSeconds) * 100) + '%';
+
+      if (secondsLeft <= 0) {
+        clearInterval(countdownInterval);
+        if (document.referrer && document.referrer !== window.location.href) {
+          window.location.href = document.referrer;
+        } else {
+          window.location.href = "{{ url_for('user.home') }}";
+        }
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

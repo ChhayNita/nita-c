@@ -1,0 +1,1372 @@
+{% extends "front/base.html" %}
+
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<div class="checkout-wrapper">
+  <div class="checkout-container">
+    
+    <!-- Top Step Bar & Breadcrumb -->
+    <div class="checkout-header">
+      <div class="checkout-title-group">
+        <div class="checkout-breadcrumbs">
+          <a href="{{ url_for('user.cart') }}">Cart</a>
+          <span class="crumb-separator">/</span>
+          <span class="crumb-active">Checkout</span>
+          <span class="crumb-separator">/</span>
+          <span class="crumb-pending">Payment</span>
+        </div>
+        <h1 class="checkout-main-title">Secure Checkout</h1>
+      </div>
+      <a href="{{ url_for('user.cart') }}" class="back-to-cart-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Back to Cart
+      </a>
+    </div>
+
+    <!-- Main Two-Column Layout -->
+    <div class="checkout-layout">
+      
+      <!-- LEFT COLUMN: Checkout Form -->
+      <form id="checkout-form" class="checkout-form-column" method="post" action="{{ url_for('user.checkout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- SECTION 1: Fulfillment Option -->
+        <div class="checkout-card">
+          <div class="card-section-head">
+            <div class="step-badge">1</div>
+            <div>
+              <h2 class="card-heading">Fulfillment Method</h2>
+              <p class="card-subheading">Choose how you would like to receive your order</p>
+            </div>
+          </div>
+
+          <div class="fulfillment-selector">
+            <!-- Delivery Card -->
+            <label id="opt-delivery" class="method-card active" onclick="selectFulfillment('delivery')">
+              <input type="radio" name="delivery_type" value="delivery" checked class="native-radio">
+              <div class="radio-indicator">
+                <div class="radio-dot"></div>
+              </div>
+              <div class="method-icon-wrap delivery-icon-wrap">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              </div>
+              <div class="method-details">
+                <div class="method-title-row">
+                  <strong class="method-title">Home Delivery</strong>
+                  <span class="badge-free">FREE</span>
+                </div>
+                <p class="method-desc">Doorstep delivery across Phnom Penh & Provinces</p>
+              </div>
+            </label>
+
+            <!-- Store Pickup Card -->
+            <label id="opt-pickup" class="method-card" onclick="selectFulfillment('pickup')">
+              <input type="radio" name="delivery_type" value="pickup" class="native-radio">
+              <div class="radio-indicator">
+                <div class="radio-dot"></div>
+              </div>
+              <div class="method-icon-wrap pickup-icon-wrap">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              </div>
+              <div class="method-details">
+                <div class="method-title-row">
+                  <strong class="method-title">Store Pickup</strong>
+                  <span class="badge-free">FREE</span>
+                </div>
+                <p class="method-desc">Pick up directly at SV7 Store Main Branch</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Customer & Shipping Details -->
+        <div class="checkout-card">
+          <div class="card-section-head">
+            <div class="step-badge">2</div>
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <h2 class="card-heading">Contact & Information</h2>
+                {% if user or session.get('user_email') %}
+                  <span style="font-size: 0.75rem; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 2px 10px 2px 6px; border-radius: 9999px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                    <img src="{{ user.profile_image if user else (session.get('user_image') or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png') }}" alt="Avatar" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; border: 1.5px solid #047857;" onerror="this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png'">
+                    <span>Logged in as {{ user.fullname if user and user.fullname else (session.get('username') or session.get('user_email')) }}</span>
+                  </span>
+                {% endif %}
+              </div>
+              <p class="card-subheading">Enter your contact details for order tracking and notification</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="customer-name">
+                Full Name <span class="req-star">*</span>
+              </label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <input type="text" id="customer-name" name="name" required placeholder="e.g. Sokha Chan" class="modern-input" value="{{ user.fullname or user.name if user else (session.get('username') or '') }}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="customer-phone">
+                Phone Number <span class="req-star">*</span>
+              </label>
+              <div class="input-with-icon">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                <input type="tel" id="customer-phone" name="phone" required placeholder="012 345 678" class="modern-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="customer-email">
+              Email Address <span class="optional-tag">(Optional, for digital invoice)</span>
+            </label>
+            <div class="input-with-icon">
+              <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <input type="email" id="customer-email" name="email" placeholder="customer@example.com" class="modern-input" value="{{ user.email if user else (session.get('user_email') or '') }}">
+            </div>
+          </div>
+
+          <!-- Shipping Address (Visible when Delivery) -->
+          <div id="address-block" class="form-group">
+            <label class="form-label" for="shipping-address">
+              Delivery Address <span class="req-star">*</span>
+            </label>
+            <div class="textarea-with-icon">
+              <svg class="field-icon textarea-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <textarea id="shipping-address" name="address" required rows="3" placeholder="House / Street number, Sangkat, Khan, Landmark (Phnom Penh or Province)..." class="modern-textarea"></textarea>
+            </div>
+          </div>
+
+          <!-- Pickup Branch Card (Visible when Store Pickup) -->
+          <div id="pickup-block" class="pickup-info-box" style="display: none;">
+            <div class="pickup-badge-row">
+              <span class="pickup-badge">STORE LOCATION</span>
+              <span class="pickup-status">Open Today: 8:00 AM - 8:30 PM</span>
+            </div>
+            <div class="pickup-address-card">
+              <div class="pickup-map-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+              </div>
+              <div>
+                <strong class="branch-name">SV7 Store Main Branch</strong>
+                <p class="branch-address">No. 168, Preah Monivong Blvd, Sangkat Boeung Keng Kang 1, Phnom Penh</p>
+                <div class="branch-hint">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>Ready for collection within 1 hour after payment. Please show your order number.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Notes -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="order-notes">
+              Order Notes <span class="optional-tag">(Optional)</span>
+            </label>
+            <textarea id="order-notes" name="notes" rows="2" placeholder="e.g. Call before delivery, gate code, or gift note..." class="modern-textarea"></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Payment Method -->
+        <div class="checkout-card">
+          <div class="card-section-head">
+            <div class="step-badge">3</div>
+            <div>
+              <h2 class="card-heading">Payment Method</h2>
+              <p class="card-subheading">All transactions are secure and encrypted</p>
+            </div>
+          </div>
+
+          <div class="payment-methods-stack">
+            <!-- 1. Bakong KHQR Card -->
+            <label id="pay-khqr-card" class="payment-card active-khqr" onclick="selectPayment('khqr')">
+              <input type="radio" name="payment_method" value="khqr" checked class="native-radio">
+              <div class="radio-indicator khqr-indicator">
+                <div class="radio-dot"></div>
+              </div>
+              <div class="payment-card-body">
+                <div class="payment-title-row">
+                  <div class="payment-name-group">
+                    <strong class="payment-name">Pay with KHQR</strong>
+                    <span class="khqr-badge">BAKONG</span>
+                    <span class="popular-pill">Instant Scan</span>
+                  </div>
+                  <div class="bank-pill-icons">
+                    <span class="bank-chip">ABA</span>
+                    <span class="bank-chip">Wing</span>
+                    <span class="bank-chip">ACLEDA</span>
+                    <span class="bank-chip-more">+30</span>
+                  </div>
+                </div>
+                <p class="payment-desc">Scan dynamic QR code with Bakong, ABA Mobile, Wing Bank, ACLEDA, or any Cambodian banking app.</p>
+                <div class="payment-subnote">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                  <span>National Bank of Cambodia KHQR verified • Zero extra fee</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- 2. Cash Option Card -->
+            <label id="pay-cash-card" class="payment-card" onclick="selectPayment('cash')">
+              <input type="radio" name="payment_method" value="cash" class="native-radio">
+              <div class="radio-indicator">
+                <div class="radio-dot"></div>
+              </div>
+              <div class="payment-card-body">
+                <div class="payment-title-row">
+                  <strong class="payment-name" id="cash-method-title">Cash on Delivery</strong>
+                  <span class="cash-icon-pill">💵 Cash</span>
+                </div>
+                <p class="payment-desc" id="cash-method-desc">Pay with cash to our delivery courier upon receiving your package.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button in Form (for mobile or bottom flow) -->
+        <div class="form-submit-container">
+          <button type="submit" id="main-submit-btn" class="checkout-cta-btn khqr-theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span id="btn-label-text">Proceed to Pay with KHQR • ${{ "%.2f"|format(total) }}</span>
+          </button>
+          <div class="security-caption">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Guaranteed Safe & Secure Checkout Powered by NBC Bakong</span>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- RIGHT COLUMN: Order Summary (Sticky) -->
+      <aside class="checkout-summary-column">
+        <div class="summary-card">
+          
+          <div class="summary-head">
+            <h2 class="summary-title">Order Summary</h2>
+            <span class="item-count-chip">{{ items|length }} item{{ 's' if items|length != 1 else '' }}</span>
+          </div>
+
+          <!-- Items List (scrollable if many) -->
+          <div class="summary-items-list">
+            {% for item in items %}
+              <div class="summary-item">
+                <div class="item-img-wrapper">
+                  <img src="{{ item.product.image or item.product.thumbnail or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png' }}" 
+                       alt="{{ item.product.title }}" 
+                       class="item-img"
+                       onerror="this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png'">
+                  <span class="item-qty-badge">{{ item.quantity }}</span>
+                </div>
+                <div class="item-info">
+                  <h4 class="item-name">{{ item.product.title }}</h4>
+                  <div class="item-meta">
+                    <span class="item-unit-price">${{ "%.2f"|format(item.product.price) }} each</span>
+                  </div>
+                </div>
+                <div class="item-total">
+                  ${{ "%.2f"|format(item.subtotal) }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Price Calculations -->
+          <div class="summary-calc-box">
+            <div class="calc-row">
+              <span class="calc-label">Subtotal</span>
+              <span class="calc-value">${{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Estimated Delivery</span>
+              <span class="calc-value free-val">FREE</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Processing / Payment Fee</span>
+              <span class="calc-value free-val">$0.00</span>
+            </div>
+            
+            <div class="calc-divider"></div>
+
+            <div class="calc-total-row">
+              <div class="total-text-group">
+                <span class="total-title">Total Payable</span>
+                <span class="total-sub">Includes all applicable duties</span>
+              </div>
+              <div class="total-price-group">
+                <span class="total-curr">USD</span>
+                <span class="total-num">${{ "%.2f"|format(total) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA Button in Summary -->
+          <div class="summary-cta-wrap">
+            <button type="submit" form="checkout-form" id="summary-submit-btn" class="checkout-cta-btn khqr-theme">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span id="summary-btn-text">Pay with KHQR • ${{ "%.2f"|format(total) }}</span>
+            </button>
+          </div>
+
+          <!-- Trust Badges -->
+          <div class="trust-features">
+            <div class="trust-item">
+              <div class="trust-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <div>
+                <strong>Bakong KHQR Protected</strong>
+                <p>Official NBC payment gateway</p>
+              </div>
+            </div>
+            <div class="trust-item">
+              <div class="trust-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+              <div>
+                <strong>Zero Push Until Paid</strong>
+                <p>Pending orders are never billed</p>
+              </div>
+            </div>
+            <div class="trust-item">
+              <div class="trust-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <div>
+                <strong>Fast Dispatch</strong>
+                <p>Prepared in under 60 minutes</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* ==========================================================================
+     MODERN CLEAN CHECKOUT STYLES
+     ========================================================================== */
+  .checkout-wrapper {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    padding: 32px 0 64px;
+    background: #f8fafc;
+    min-height: calc(100vh - 120px);
+  }
+
+  .checkout-container {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+  }
+
+  /* Header & Breadcrumbs */
+  .checkout-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .checkout-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.825rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .checkout-breadcrumbs a {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .checkout-breadcrumbs a:hover {
+    color: #078678;
+  }
+
+  .crumb-separator {
+    color: #cbd5e1;
+    font-size: 0.75rem;
+  }
+
+  .crumb-active {
+    color: #078678;
+    background: #e6f6f4;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+  }
+
+  .crumb-pending {
+    color: #94a3b8;
+  }
+
+  .checkout-main-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+
+  .back-to-cart-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+  }
+
+  .back-to-cart-link:hover {
+    color: #0f172a;
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+  }
+
+  /* Grid Layout */
+  .checkout-layout {
+    display: grid;
+    grid-template-columns: 1.25fr 0.85fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* Card Container */
+  .checkout-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+    margin-bottom: 24px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .checkout-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -4px rgba(0, 0, 0, 0.02);
+  }
+
+  .card-section-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .step-badge {
+    width: 32px;
+    height: 32px;
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card-heading {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .card-subheading {
+    font-size: 0.825rem;
+    color: #64748b;
+    margin: 2px 0 0;
+  }
+
+  /* 1. Fulfillment Selector */
+  .fulfillment-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .method-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .method-card:hover {
+    border-color: #cbd5e1;
+    background: #fafafa;
+  }
+
+  .method-card.active {
+    border-color: #078678;
+    background: #f0fbf9;
+    box-shadow: 0 0 0 1px #078678;
+  }
+
+  .native-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .radio-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .radio-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: transparent;
+    transition: all 0.2s;
+  }
+
+  .method-card.active .radio-indicator {
+    border-color: #078678;
+  }
+
+  .method-card.active .radio-dot {
+    background: #078678;
+  }
+
+  .method-icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .delivery-icon-wrap {
+    background: #e0f2fe;
+    color: #0284c7;
+  }
+
+  .pickup-icon-wrap {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .method-details {
+    flex: 1;
+  }
+
+  .method-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .method-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .badge-free {
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .method-desc {
+    font-size: 0.775rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* 2. Form Inputs */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .req-star {
+    color: #e11d48;
+    font-weight: bold;
+  }
+
+  .optional-tag {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  .input-with-icon,
+  .textarea-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .field-icon {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8;
+    pointer-events: none;
+    transition: color 0.15s;
+  }
+
+  .textarea-icon {
+    top: 14px;
+  }
+
+  .modern-input,
+  .modern-textarea {
+    width: 100%;
+    padding: 12px 14px 12px 42px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #ffffff;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  }
+
+  .modern-input:focus,
+  .modern-textarea:focus {
+    outline: none;
+    border-color: #078678;
+    box-shadow: 0 0 0 3px rgba(7, 134, 120, 0.15);
+  }
+
+  .modern-input:focus + .field-icon,
+  .modern-textarea:focus + .field-icon {
+    color: #078678;
+  }
+
+  .modern-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  /* Pickup Info Box */
+  .pickup-info-box {
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .pickup-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .pickup-badge {
+    background: #f59e0b;
+    color: #ffffff;
+    font-size: 0.675rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .pickup-status {
+    font-size: 0.775rem;
+    font-weight: 700;
+    color: #b45309;
+  }
+
+  .pickup-address-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .pickup-map-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #fef3c7;
+    color: #b45309;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .branch-name {
+    font-size: 0.95rem;
+    color: #78350f;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .branch-address {
+    font-size: 0.825rem;
+    color: #92400e;
+    margin: 0 0 8px;
+    line-height: 1.4;
+  }
+
+  .branch-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.775rem;
+    color: #b45309;
+    font-weight: 600;
+  }
+
+  /* 3. Payment Methods */
+  .payment-methods-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .payment-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .payment-card:hover {
+    border-color: #cbd5e1;
+    background: #fafafa;
+  }
+
+  .payment-card.active-khqr {
+    border-color: #e11d48;
+    background: #fff5f6;
+    box-shadow: 0 0 0 1px #e11d48, 0 4px 12px rgba(225, 29, 72, 0.08);
+  }
+
+  .payment-card.active-cash {
+    border-color: #078678;
+    background: #f0fbf9;
+    box-shadow: 0 0 0 1px #078678, 0 4px 12px rgba(7, 134, 120, 0.08);
+  }
+
+  .khqr-indicator.active-khqr .radio-indicator {
+    border-color: #e11d48;
+  }
+
+  .payment-card.active-khqr .radio-indicator {
+    border-color: #e11d48;
+  }
+
+  .payment-card.active-khqr .radio-dot {
+    background: #e11d48;
+  }
+
+  .payment-card.active-cash .radio-indicator {
+    border-color: #078678;
+  }
+
+  .payment-card.active-cash .radio-dot {
+    background: #078678;
+  }
+
+  .payment-card-body {
+    flex: 1;
+  }
+
+  .payment-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .payment-name-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .payment-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .khqr-badge {
+    background: #e11d48;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .popular-pill {
+    background: #fecdd3;
+    color: #be123c;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+
+  .cash-icon-pill {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  .bank-pill-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .bank-chip {
+    font-size: 0.65rem;
+    font-weight: 800;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .bank-chip-more {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  .payment-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 4px 0 6px;
+    line-height: 1.4;
+  }
+
+  .payment-subnote {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.725rem;
+    color: #9f1239;
+    font-weight: 700;
+  }
+
+  /* Submit Button & CTA */
+  .form-submit-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .checkout-cta-btn {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 24px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .checkout-cta-btn.khqr-theme {
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+  }
+
+  .checkout-cta-btn.khqr-theme:hover {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.45);
+  }
+
+  .checkout-cta-btn.cash-theme {
+    background: linear-gradient(135deg, #078678 0%, #056b61 100%);
+    box-shadow: 0 4px 14px rgba(7, 134, 120, 0.35);
+  }
+
+  .checkout-cta-btn.cash-theme:hover {
+    background: linear-gradient(135deg, #099b8b 0%, #078678 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(7, 134, 120, 0.45);
+  }
+
+  .security-caption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  /* RIGHT COLUMN: Order Summary Card */
+  .checkout-summary-column {
+    position: sticky;
+    top: 24px;
+  }
+
+  .summary-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  }
+
+  .summary-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 16px;
+  }
+
+  .summary-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .item-count-chip {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  /* Items List in Summary */
+  .summary-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 20px;
+  }
+
+  .summary-items-list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .summary-items-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .item-img-wrapper {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+  }
+
+  .item-qty-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+  }
+
+  .item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-meta {
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  .item-total {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #0f172a;
+    font-family: monospace;
+    flex-shrink: 0;
+  }
+
+  /* Calculations Box */
+  .summary-calc-box {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .calc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+  }
+
+  .calc-label {
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .calc-value {
+    color: #1e293b;
+    font-weight: 700;
+    font-family: monospace;
+  }
+
+  .calc-value.free-val {
+    color: #15803d;
+    font-weight: 800;
+  }
+
+  .calc-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
+  }
+
+  .calc-total-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .total-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+    display: block;
+  }
+
+  .total-sub {
+    font-size: 0.7rem;
+    color: #94a3b8;
+  }
+
+  .total-price-group {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .total-curr {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  .total-num {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #0f172a;
+    font-family: monospace;
+  }
+
+  .summary-cta-wrap {
+    margin-top: 16px;
+  }
+
+  /* Trust Features */
+  .trust-features {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .trust-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #078678;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .trust-item strong {
+    font-size: 0.75rem;
+    color: #1e293b;
+    display: block;
+  }
+
+  .trust-item p {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive Breakpoints */
+  @media (max-width: 960px) {
+    .checkout-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .checkout-summary-column {
+      position: static;
+      order: -1; /* Place summary on top for easy review on tablet/mobile */
+    }
+
+    .summary-cta-wrap {
+      display: none; /* Rely on bottom form CTA on mobile to avoid duplicate confusion */
+    }
+  }
+
+  @media (max-width: 600px) {
+    .fulfillment-selector,
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .checkout-main-title {
+      font-size: 1.4rem;
+    }
+
+    .checkout-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+</style>
+
+<script>
+  let currentFulfillment = 'delivery';
+  let currentPayment = 'khqr';
+  const orderTotal = '{{ "%.2f"|format(total) }}';
+
+  function selectFulfillment(type) {
+    currentFulfillment = type;
+    const optDelivery = document.getElementById('opt-delivery');
+    const optPickup = document.getElementById('opt-pickup');
+    const addrBlock = document.getElementById('address-block');
+    const pickupBlock = document.getElementById('pickup-block');
+    const shippingAddrInput = document.getElementById('shipping-address');
+    const cashTitle = document.getElementById('cash-method-title');
+    const cashDesc = document.getElementById('cash-method-desc');
+
+    // Update radios
+    optDelivery.querySelector('input').checked = (type === 'delivery');
+    optPickup.querySelector('input').checked = (type === 'pickup');
+
+    if (type === 'delivery') {
+      optDelivery.classList.add('active');
+      optPickup.classList.remove('active');
+      addrBlock.style.display = 'block';
+      pickupBlock.style.display = 'none';
+      shippingAddrInput.required = true;
+      if (cashTitle) cashTitle.textContent = 'Cash on Delivery';
+      if (cashDesc) cashDesc.textContent = 'Pay with physical cash to our courier when your order arrives.';
+    } else {
+      optPickup.classList.add('active');
+      optDelivery.classList.remove('active');
+      addrBlock.style.display = 'none';
+      pickupBlock.style.display = 'block';
+      shippingAddrInput.required = false;
+      if (cashTitle) cashTitle.textContent = 'Pay on Pickup (at store)';
+      if (cashDesc) cashDesc.textContent = 'Pay with cash at SV7 Store counter when you collect your item.';
+    }
+    updateButtonLabels();
+  }
+
+  function selectPayment(type) {
+    currentPayment = type;
+    const cardKhqr = document.getElementById('pay-khqr-card');
+    const cardCash = document.getElementById('pay-cash-card');
+
+    // Update radios
+    cardKhqr.querySelector('input').checked = (type === 'khqr');
+    cardCash.querySelector('input').checked = (type === 'cash');
+
+    if (type === 'khqr') {
+      cardKhqr.className = 'payment-card active-khqr';
+      cardCash.className = 'payment-card';
+    } else {
+      cardCash.className = 'payment-card active-cash';
+      cardKhqr.className = 'payment-card';
+    }
+    updateButtonLabels();
+  }
+
+  function updateButtonLabels() {
+    const mainBtn = document.getElementById('main-submit-btn');
+    const summaryBtn = document.getElementById('summary-submit-btn');
+    const mainLabel = document.getElementById('btn-label-text');
+    const summaryLabel = document.getElementById('summary-btn-text');
+
+    if (currentPayment === 'khqr') {
+      if (mainBtn) {
+        mainBtn.className = 'checkout-cta-btn khqr-theme';
+        mainLabel.textContent = `Proceed to Pay with KHQR • $${orderTotal}`;
+      }
+      if (summaryBtn) {
+        summaryBtn.className = 'checkout-cta-btn khqr-theme';
+        summaryLabel.textContent = `Pay with KHQR • $${orderTotal}`;
+      }
+    } else {
+      const actionText = currentFulfillment === 'pickup' ? 'Place Store Pickup Order' : 'Place Cash Order';
+      if (mainBtn) {
+        mainBtn.className = 'checkout-cta-btn cash-theme';
+        mainLabel.textContent = `${actionText} • $${orderTotal}`;
+      }
+      if (summaryBtn) {
+        summaryBtn.className = 'checkout-cta-btn cash-theme';
+        summaryLabel.textContent = `${actionText} • $${orderTotal}`;
+      }
+    }
+  }
+
+  // Pre-initialize state
+  document.addEventListener('DOMContentLoaded', () => {
+    selectFulfillment('delivery');
+    selectPayment('khqr');
+  });
+</script>
+{% endblock %}

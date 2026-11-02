@@ -1,0 +1,135 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Top Header & Breadcrumb -->
+<div class="flex items-center justify-between">
+  <div>
+    <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+      <a href="{{ url_for('admin.admin_orders') }}" class="hover:text-white transition">Orders</a>
+      <span>/</span>
+      <span class="text-amber-400 font-medium">Pickup Orders</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <h2 class="text-xl font-bold text-white tracking-tight">Store Pickup Orders</h2>
+      <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+        {{ orders|length }} Pending/Ready Pickups
+      </span>
+    </div>
+  </div>
+  <a href="{{ url_for('admin.admin_orders') }}" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition">
+    <span>View All Orders</span>
+  </a>
+</div>
+
+<!-- Sub-navigation Tabs -->
+<div class="p-4 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+  <div class="flex items-center gap-1.5 p-1 bg-slate-800/80 rounded-xl border border-slate-700/80 text-xs">
+    <a href="{{ url_for('admin.admin_orders') }}" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+      All ({{ stats.total }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_pickup') }}" class="px-3.5 py-1.5 rounded-lg font-semibold bg-amber-600 text-white shadow-sm transition">
+      Pickup ({{ stats.pickup }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_khqr') }}" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+      Pay with KHQR ({{ stats.khqr }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_delivery') }}" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+      Delivery ({{ stats.delivery }})
+    </a>
+  </div>
+
+  <form method="GET" action="{{ url_for('admin.admin_orders_pickup') }}" class="relative w-full md:w-72">
+    <input type="text" name="search" value="{{ search or '' }}" placeholder="Search pickup orders..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 pl-9">
+    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+  </form>
+</div>
+
+<!-- Pickup Orders Table -->
+<div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-4">
+  <div class="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300">
+    <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <span>These customers will collect their products in person at <strong>SV7 Store Main Branch</strong>. Verify customer phone number upon pickup.</span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-xs">
+      <thead>
+        <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+          <th class="py-3 px-4">Order #</th>
+          <th class="py-3 px-4">Customer</th>
+          <th class="py-3 px-4">Contact Phone</th>
+          <th class="py-3 px-4">Payment</th>
+          <th class="py-3 px-4">Total</th>
+          <th class="py-3 px-4">Pickup Status</th>
+          <th class="py-3 px-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800/60 text-slate-300">
+        {% if orders %}
+          {% for o in orders %}
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-3.5 px-4">
+              <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="font-bold text-white hover:text-amber-400 font-mono">
+                #{{ o.order_number }}
+              </a>
+              <p class="text-[11px] text-slate-500">{{ o.items|length }} item{{ 's' if o.items|length != 1 else '' }}</p>
+            </td>
+
+            <td class="py-3.5 px-4">
+              <p class="font-semibold text-white">{{ o.customer_name }}</p>
+              <p class="text-[11px] text-slate-400">{{ o.customer_email or 'No email' }}</p>
+            </td>
+
+            <td class="py-3.5 px-4 font-mono font-semibold text-white">
+              {{ o.customer_phone }}
+            </td>
+
+            <td class="py-3.5 px-4">
+              {% if o.payment_method == 'khqr' %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                  KHQR (Paid)
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/15 text-amber-300 border border-amber-500/20">
+                  Pay at Pickup
+                </span>
+              {% endif %}
+            </td>
+
+            <td class="py-3.5 px-4 font-bold text-white font-mono">
+              ${{ "%.2f"|format(o.total_amount) }}
+            </td>
+
+            <td class="py-3.5 px-4">
+              <form action="{{ url_for('admin.admin_order_update_status', order_id=o.id) }}" method="POST" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="order_status" onchange="this.form.submit()" class="bg-slate-800 border border-slate-700 text-xs text-white rounded-lg px-2.5 py-1 focus:outline-none focus:border-amber-500">
+                  <option value="Processing" {% if o.order_status == 'Processing' %}selected{% endif %}>Processing</option>
+                  <option value="Ready for Pickup" {% if o.order_status == 'Ready for Pickup' %}selected{% endif %}>Ready for Pickup</option>
+                  <option value="Picked Up" {% if o.order_status == 'Picked Up' %}selected{% endif %}>Picked Up</option>
+                  <option value="Completed" {% if o.order_status == 'Completed' %}selected{% endif %}>Completed</option>
+                  <option value="Cancelled" {% if o.order_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+              </form>
+            </td>
+
+            <td class="py-3.5 px-4 text-right">
+              <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>Details</span>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="py-12 text-center text-slate-500">
+              No store pickup orders found.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

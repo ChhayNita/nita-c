@@ -1,0 +1,51 @@
+<!-- Top Header Component -->
+<header class="h-16 px-4 sm:px-6 glass-panel border-b border-slate-800 flex items-center justify-between sticky top-0 z-30 shrink-0">
+  <!-- Title, Status & Mobile Toggle -->
+  <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+    <button type="button" onclick="toggleAdminSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition shrink-0" title="Toggle Menu">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <h2 class="text-base sm:text-xl font-bold text-white tracking-tight truncate">
+      {% if active_page == 'product' %}Product Catalog
+      {% elif active_page == 'user' %}User Management
+      {% elif active_page == 'dashboard' %}Overview Dashboard
+      {% elif page_title %}{{ page_title }}
+      {% else %}Overview Dashboard{% endif %}
+    </h2>
+    <span class="hidden md:inline-flex text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium items-center gap-1.5 shrink-0">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Systems Operational
+    </span>
+  </div>
+
+  <!-- Right Header Options -->
+  <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+    <!-- Quick Search -->
+    <div class="relative hidden sm:block">
+      <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search anything..." class="w-36 md:w-56 lg:w-64 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-1.5 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-9 transition-all">
+      <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    </div>
+
+    <!-- Notification Button -->
+    <button onclick="showToast('Notification center: 3 new orders today', 'info')" class="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition relative" title="Notifications">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-blue-500 rounded-full border-2 border-slate-800"></span>
+    </button>
+
+    <!-- Store Front Link Button -->
+    <a href="{{ url_for('user.home') }}" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition">
+      <span class="hidden sm:inline">Store Front</span>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+    </a>
+
+    <!-- Profile Avatar Link -->
+    <a href="{% if current_user.id %}{{ url_for('admin.admin_user_edit', user_id=current_user.id) }}{% else %}#{% endif %}" class="flex items-center gap-2 pl-1 sm:pl-2 border-l border-slate-800" title="Edit {{ current_user.fullname }} Profile">
+      {% if current_user.image %}
+      <img src="{{ current_user.image }}" alt="{{ current_user.fullname }}" class="w-8 h-8 rounded-full object-cover border border-slate-700 shadow shrink-0 hover:ring-2 hover:ring-blue-500 transition">
+      {% else %}
+      <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-500 to-indigo-500 flex items-center justify-center font-bold text-white text-[11px] shadow shrink-0 hover:ring-2 hover:ring-blue-500 transition">
+        {{ current_user.avatar or 'CN' }}
+      </div>
+      {% endif %}
+    </a>
+  </div>
+</header>

@@ -1,0 +1,183 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Page Header & Metrics Bar -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+  <div class="p-4 rounded-2xl glass-panel border border-slate-800 flex items-center gap-3.5">
+    <div class="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+    </div>
+    <div>
+      <p class="text-xs text-slate-400 font-medium">Total Orders</p>
+      <p class="text-lg font-bold text-white">{{ stats.total }}</p>
+    </div>
+  </div>
+
+  <div class="p-4 rounded-2xl glass-panel border border-slate-800 flex items-center gap-3.5">
+    <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+    </div>
+    <div>
+      <p class="text-xs text-slate-400 font-medium">Store Pickup</p>
+      <p class="text-lg font-bold text-amber-400">{{ stats.pickup }}</p>
+    </div>
+  </div>
+
+  <div class="p-4 rounded-2xl glass-panel border border-slate-800 flex items-center gap-3.5">
+    <div class="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+    </div>
+    <div>
+      <p class="text-xs text-slate-400 font-medium">Pay with KHQR</p>
+      <p class="text-lg font-bold text-rose-400">{{ stats.khqr }}</p>
+    </div>
+  </div>
+
+  <div class="p-4 rounded-2xl glass-panel border border-slate-800 flex items-center gap-3.5">
+    <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+    </div>
+    <div>
+      <p class="text-xs text-slate-400 font-medium">Delivery</p>
+      <p class="text-lg font-bold text-emerald-400">{{ stats.delivery }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Controls & Tabs -->
+<div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+  <!-- Sub-navigation Tabs -->
+  <div class="flex items-center gap-1.5 p-1 bg-slate-800/80 rounded-xl border border-slate-700/80 text-xs">
+    <a href="{{ url_for('admin.admin_orders') }}" class="px-3.5 py-1.5 rounded-lg font-semibold {% if active_subpage == 'all' %}bg-blue-600 text-white shadow-sm{% else %}text-slate-400 hover:text-white{% endif %} transition">
+      All ({{ stats.total }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_pickup') }}" class="px-3.5 py-1.5 rounded-lg font-semibold {% if active_subpage == 'pickup' %}bg-amber-600 text-white shadow-sm{% else %}text-slate-400 hover:text-white{% endif %} transition">
+      Pickup ({{ stats.pickup }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_khqr') }}" class="px-3.5 py-1.5 rounded-lg font-semibold {% if active_subpage == 'khqr' %}bg-rose-600 text-white shadow-sm{% else %}text-slate-400 hover:text-white{% endif %} transition">
+      Pay with KHQR ({{ stats.khqr }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_delivery') }}" class="px-3.5 py-1.5 rounded-lg font-semibold {% if active_subpage == 'delivery' %}bg-emerald-600 text-white shadow-sm{% else %}text-slate-400 hover:text-white{% endif %} transition">
+      Delivery ({{ stats.delivery }})
+    </a>
+  </div>
+
+  <!-- Search Filter -->
+  <form method="GET" action="{{ url_for('admin.admin_orders') }}" class="relative w-full md:w-72">
+    <input type="text" name="search" value="{{ search or '' }}" placeholder="Search order #, customer, phone..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 pl-9">
+    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+  </form>
+</div>
+
+<!-- Orders Table -->
+<div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-xs">
+      <thead>
+        <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+          <th class="py-3 px-4">Order #</th>
+          <th class="py-3 px-4">Customer</th>
+          <th class="py-3 px-4">Fulfillment</th>
+          <th class="py-3 px-4">Payment</th>
+          <th class="py-3 px-4">Total</th>
+          <th class="py-3 px-4">Status</th>
+          <th class="py-3 px-4">Date</th>
+          <th class="py-3 px-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800/60 text-slate-300">
+        {% if orders %}
+          {% for o in orders %}
+          <tr class="hover:bg-slate-800/40 transition">
+            <!-- Order Number & Items Count -->
+            <td class="py-3.5 px-4">
+              <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="font-bold text-white hover:text-blue-400 font-mono">
+                #{{ o.order_number }}
+              </a>
+              <p class="text-[11px] text-slate-500">{{ o.items|length }} item{{ 's' if o.items|length != 1 else '' }}</p>
+            </td>
+
+            <!-- Customer Details -->
+            <td class="py-3.5 px-4">
+              <p class="font-semibold text-white">{{ o.customer_name }}</p>
+              <p class="text-[11px] text-slate-400 font-mono">{{ o.customer_phone }}</p>
+            </td>
+
+            <!-- Fulfillment Type (Pickup vs Delivery) -->
+            <td class="py-3.5 px-4">
+              {% if o.delivery_type == 'pickup' %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  Pickup
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  Delivery
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Payment Method & Status -->
+            <td class="py-3.5 px-4">
+              {% if o.payment_method == 'khqr' %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                  KHQR (Bakong)
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-slate-700 text-slate-300">
+                  Cash
+                </span>
+              {% endif %}
+              <p class="text-[10px] mt-0.5 {% if o.payment_status == 'Paid' %}text-emerald-400 font-semibold{% else %}text-amber-400{% endif %}">
+                ● {{ o.payment_status }}
+              </p>
+            </td>
+
+            <!-- Total Amount -->
+            <td class="py-3.5 px-4 font-bold text-white font-mono">
+              ${{ "%.2f"|format(o.total_amount) }}
+            </td>
+
+            <!-- Order Status -->
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold
+                {% if o.order_status == 'Completed' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                {% elif o.order_status == 'Processing' %}bg-blue-500/10 text-blue-400 border border-blue-500/20
+                {% elif o.order_status == 'Delivered' %}bg-indigo-500/10 text-indigo-400 border border-indigo-500/20
+                {% elif o.order_status == 'Ready for Pickup' %}bg-amber-500/10 text-amber-400 border border-amber-500/20
+                {% elif o.order_status == 'Cancelled' %}bg-rose-500/10 text-rose-400 border border-rose-500/20
+                {% else %}bg-slate-700 text-slate-300{% endif %}">
+                {{ o.order_status }}
+              </span>
+            </td>
+
+            <!-- Date -->
+            <td class="py-3.5 px-4 text-slate-400 font-mono text-[11px]">
+              {{ o.create_at.strftime('%Y-%m-%d %H:%M') if o.create_at else '-' }}
+            </td>
+
+            <!-- Action Buttons -->
+            <td class="py-3.5 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition" title="View Order">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  <span>View</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" class="py-12 text-center text-slate-500">
+              <svg class="w-10 h-10 mx-auto text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              No orders found in this section.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

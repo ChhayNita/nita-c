@@ -15,7 +15,18 @@
           <a href="{{ url_for('user.products') }}">Products</a>
           <a href="{{ url_for('user.cart') }}">Cart ({{ cart_count }})</a>
           {% if current_user %}
-            <a class="user-link" href="{{ url_for('user.account') }}">Hi, {{ current_user.name }}</a>
+            {% if session.get('admin_logged_in') or session.get('user_role') == 'Admin' or current_user.role == 'Admin' %}
+              <a href="{{ url_for('admin.admin_dashboard') }}" style="background: #0f172a; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                <span>⚙️ Admin Panel</span>
+              </a>
+            {% endif %}
+            <a class="user-link" href="{{ url_for('user.account') }}" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+              <img src="{{ current_user.image or current_user.profile_image or session.get('user_image') or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png' }}" 
+                   alt="{{ current_user.name or 'User' }}" 
+                   style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary, #078678); box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                   onerror="this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png'">
+              <span>Hi, {{ current_user.name }}</span>
+            </a>
             <form class="nav-form" method="post" action="{{ url_for('user.logout') }}">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button class="nav-button" type="submit">Logout</button>

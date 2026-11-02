@@ -8,16 +8,14 @@
     <div class="flex justify-between items-start">
       <div>
         <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Revenue</p>
-        <h3 class="text-2xl font-bold text-white mt-1">$48,290.50</h3>
+        <h3 class="text-2xl font-bold text-white mt-1">${{ "%.2f"|format(total_revenue or 0) }}</h3>
       </div>
       <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       </div>
     </div>
     <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-400">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-      <span>+14.2%</span>
-      <span class="text-slate-500 font-normal">vs last month</span>
+      <span>● Paid Bakong & Store Orders</span>
     </div>
   </div>
 
@@ -26,16 +24,14 @@
     <div class="flex justify-between items-start">
       <div>
         <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Orders</p>
-        <h3 class="text-2xl font-bold text-white mt-1">1,248</h3>
+        <h3 class="text-2xl font-bold text-white mt-1">{{ total_orders or 0 }}</h3>
       </div>
       <div class="p-3 rounded-xl bg-violet-500/10 text-violet-400 group-hover:scale-110 transition-transform">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
       </div>
     </div>
-    <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-400">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-      <span>+8.1%</span>
-      <span class="text-slate-500 font-normal">vs last month</span>
+    <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-indigo-400">
+      <span>{{ pickup_orders }} Pickup • {{ delivery_orders }} Delivery</span>
     </div>
   </div>
 
@@ -44,14 +40,14 @@
     <div class="flex justify-between items-start">
       <div>
         <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Catalog</p>
-        <h3 class="text-2xl font-bold text-white mt-1">8 Items</h3>
+        <h3 class="text-2xl font-bold text-white mt-1">{{ total_products or 0 }} Items</h3>
       </div>
       <div class="p-3 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
       </div>
     </div>
     <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-amber-400">
-      <span>4 Categories</span>
+      <span>{{ total_categories }} Categories</span>
       <span class="text-slate-500 font-normal">• Inventory Ready</span>
     </div>
   </div>
@@ -61,7 +57,7 @@
     <div class="flex justify-between items-start">
       <div>
         <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Registered Users</p>
-        <h3 class="text-2xl font-bold text-white mt-1">6 Users</h3>
+        <h3 class="text-2xl font-bold text-white mt-1">{{ total_users or 0 }} Users</h3>
       </div>
       <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -113,7 +109,7 @@
       <h3 class="text-base font-bold text-white">Recent Store Orders</h3>
       <p class="text-xs text-slate-400">Latest customer purchases and order status</p>
     </div>
-    <button onclick="showToast('Viewing full order feed...', 'info')" class="text-xs font-semibold text-blue-400 hover:text-blue-300">View All Orders →</button>
+    <a href="{{ url_for('admin.admin_orders') }}" class="text-xs font-semibold text-blue-400 hover:text-blue-300">View All Orders →</a>
   </div>
 
   <div class="overflow-x-auto">
@@ -122,6 +118,7 @@
         <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
           <th class="py-3 px-4">Order ID</th>
           <th class="py-3 px-4">Customer</th>
+          <th class="py-3 px-4">Type</th>
           <th class="py-3 px-4">Date</th>
           <th class="py-3 px-4">Amount</th>
           <th class="py-3 px-4">Status</th>
@@ -129,38 +126,45 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-800/60 text-slate-300">
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9482</td>
-          <td class="py-3.5 px-4 font-medium text-white">Alex Morgan</td>
-          <td class="py-3.5 px-4 text-slate-400">Jul 22, 2026</td>
-          <td class="py-3.5 px-4 font-semibold text-white">$109.95</td>
-          <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Completed</span></td>
-          <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9482', 'info')" class="text-slate-400 hover:text-white">Details</button></td>
-        </tr>
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9481</td>
-          <td class="py-3.5 px-4 font-medium text-white">Sophia Chen</td>
-          <td class="py-3.5 px-4 text-slate-400">Jul 22, 2026</td>
-          <td class="py-3.5 px-4 font-semibold text-white">$22.30</td>
-          <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Processing</span></td>
-          <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9481', 'info')" class="text-slate-400 hover:text-white">Details</button></td>
-        </tr>
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9480</td>
-          <td class="py-3.5 px-4 font-medium text-white">Michael Scott</td>
-          <td class="py-3.5 px-4 text-slate-400">Jul 21, 2026</td>
-          <td class="py-3.5 px-4 font-semibold text-white">$55.99</td>
-          <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Pending</span></td>
-          <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9480', 'info')" class="text-slate-400 hover:text-white">Details</button></td>
-        </tr>
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9479</td>
-          <td class="py-3.5 px-4 font-medium text-white">Emma Watson</td>
-          <td class="py-3.5 px-4 text-slate-400">Jul 20, 2026</td>
-          <td class="py-3.5 px-4 font-semibold text-white">$699.00</td>
-          <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Completed</span></td>
-          <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9479', 'info')" class="text-slate-400 hover:text-white">Details</button></td>
-        </tr>
+        {% if recent_orders %}
+          {% for o in recent_orders %}
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-3.5 px-4 font-mono font-semibold">
+              <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="text-blue-400 hover:underline">
+                #{{ o.order_number }}
+              </a>
+            </td>
+            <td class="py-3.5 px-4 font-medium text-white">{{ o.customer_name }}</td>
+            <td class="py-3.5 px-4">
+              {% if o.delivery_type == 'pickup' %}
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Pickup</span>
+              {% else %}
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Delivery</span>
+              {% endif %}
+            </td>
+            <td class="py-3.5 px-4 text-slate-400 font-mono">{{ o.create_at.strftime('%b %d, %Y') if o.create_at else '-' }}</td>
+            <td class="py-3.5 px-4 font-semibold text-white font-mono">${{ "%.2f"|format(o.total_amount) }}</td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold
+                {% if o.order_status == 'Completed' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                {% elif o.order_status == 'Ready for Pickup' %}bg-amber-500/10 text-amber-400 border border-amber-500/20
+                {% elif o.order_status == 'Processing' %}bg-blue-500/10 text-blue-400 border border-blue-500/20
+                {% else %}bg-slate-700 text-slate-300{% endif %}">
+                {{ o.order_status }}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="text-slate-400 hover:text-white">Details</a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="py-8 text-center text-slate-500">
+              No orders placed yet.
+            </td>
+          </tr>
+        {% endif %}
       </tbody>
     </table>
   </div>

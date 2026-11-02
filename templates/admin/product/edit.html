@@ -77,24 +77,25 @@
     <!-- Main Thumbnail Image -->
     <div class="p-4 rounded-xl border border-slate-700 bg-slate-800/30 space-y-3">
       <label class="block text-slate-200 font-semibold">Main Thumbnail Image</label>
-      {% if product.thumbnail %}
-        <div class="flex items-center gap-3 p-2 bg-slate-800 rounded-lg border border-slate-700">
-          <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-12 h-12 object-cover rounded-lg">
-          <div class="overflow-hidden">
-            <span class="text-[11px] text-slate-300 block font-medium">Current Thumbnail</span>
-            <span class="text-[10px] text-slate-500 truncate block">{{ product.thumbnail }}</span>
-          </div>
+      <div class="flex items-center gap-3 p-3 bg-slate-800/60 rounded-xl border border-slate-700">
+        <img src="{{ product.thumbnail or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png' }}" 
+             alt="{{ product.name }}" 
+             onerror="this.onerror=null;this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png';"
+             class="w-14 h-14 object-cover rounded-lg border border-slate-600">
+        <div class="overflow-hidden">
+          <span class="text-xs text-slate-200 block font-medium">Current Thumbnail</span>
+          <span class="text-[11px] text-slate-500 truncate block max-w-md">{{ product.thumbnail or 'Using default placeholder' }}</span>
         </div>
-      {% endif %}
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-slate-400 text-[11px] mb-1">Replace with file upload:</label>
-          <input type="file" name="thumbnail" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
+      </div>
+
+      <div class="p-4 rounded-xl border border-dashed border-slate-700 bg-slate-800/40 space-y-2">
+        <div id="new-thumb-preview-container" class="hidden mb-2">
+          <p class="text-[11px] text-blue-400 font-medium mb-1">New Thumbnail Preview:</p>
+          <img id="new-thumb-preview" src="#" alt="New Preview" class="w-20 h-20 object-cover rounded-xl border border-slate-600 shadow-md">
         </div>
-        <div>
-          <label class="block text-slate-400 text-[11px] mb-1">Or direct URL:</label>
-          <input type="url" name="thumbnail_url" value="{{ product.thumbnail or '' }}" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all">
-        </div>
+        <label class="block text-slate-400 text-[11px] mb-1">Choose new thumbnail file:</label>
+        <input type="file" name="thumbnail" accept="image/*" onchange="previewEditProductThumb(this)" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer border border-slate-700/80 rounded-xl bg-slate-800/40 p-1">
+        <p class="text-[11px] text-slate-500 mt-1">Upload PNG, JPG, JPEG, WEBP to replace the current thumbnail</p>
       </div>
     </div>
 
@@ -135,14 +136,9 @@
 
       <!-- Upload Additional Images (multiple) -->
       <div class="pt-2 border-t border-indigo-500/20 space-y-2">
-        <label class="block text-slate-300 text-[11px] font-medium">Upload more images (Select multiple files):</label>
-        <input type="file" name="images" multiple accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gradient-to-r file:from-indigo-600 file:to-blue-600 file:text-white hover:file:from-indigo-500 hover:file:to-blue-500 cursor-pointer">
-      </div>
-
-      <!-- Add URLs -->
-      <div>
-        <label class="block text-slate-400 text-[11px] mb-1">Or add image URLs (comma or newline separated):</label>
-        <textarea name="gallery_urls" rows="2" placeholder="https://..." class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-mono text-[11px]"></textarea>
+        <label class="block text-slate-300 text-[11px] font-medium">Upload more gallery images (Select multiple files):</label>
+        <input type="file" name="images" multiple accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gradient-to-r file:from-indigo-600 file:to-blue-600 file:text-white hover:file:from-indigo-500 hover:file:to-blue-500 cursor-pointer border border-slate-700/80 rounded-xl bg-slate-800/40 p-1">
+        <p class="text-[11px] text-slate-500">Hold Ctrl (Windows) or Cmd (Mac) to select multiple files.</p>
       </div>
     </div>
 
@@ -168,6 +164,21 @@
 </form>
 
 <script>
+  function previewEditProductThumb(input) {
+    const previewContainer = document.getElementById('new-thumb-preview-container');
+    const preview = document.getElementById('new-thumb-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        previewContainer.classList.remove('hidden');
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      previewContainer.classList.add('hidden');
+    }
+  }
+
   function deleteProductImage(imageId) {
     if (confirm('Delete this product image?')) {
       const form = document.getElementById('delete-image-form');

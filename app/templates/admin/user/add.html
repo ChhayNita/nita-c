@@ -1,0 +1,118 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Page Header with Back Navigation -->
+<div class="flex items-center justify-between">
+  <div>
+    <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+      <a href="{{ url_for('admin.admin_users') }}" class="hover:text-white transition">User Management</a>
+      <span>/</span>
+      <span class="text-emerald-400 font-medium">Add New User</span>
+    </div>
+    <h2 class="text-xl font-bold text-white tracking-tight">Register System User Account</h2>
+  </div>
+  <a href="{{ url_for('admin.admin_users') }}" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    <span>Back to Users</span>
+  </a>
+</div>
+
+<!-- Add User Form Card -->
+<div class="max-w-2xl p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-6">
+  <form action="{{ url_for('admin.admin_user_add') }}" method="POST" enctype="multipart/form-data" class="space-y-5 text-xs">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <!-- Profile Image Upload Section -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-2">Profile Picture</label>
+      <div class="flex items-center gap-4">
+        <div class="relative w-16 h-16 rounded-2xl border-2 border-dashed border-slate-700 bg-slate-800/80 flex items-center justify-center overflow-hidden shrink-0 group">
+          <img id="avatar-preview" src="#" alt="Preview" class="w-full h-full object-cover hidden">
+          <div id="avatar-placeholder" class="text-slate-400 flex flex-col items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          </div>
+        </div>
+        <div class="flex-1">
+          <input type="file" id="user-image-input" name="image" accept="image/*" onchange="previewUserAvatar(this)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-emerald-400 hover:file:bg-slate-700 file:cursor-pointer cursor-pointer border border-slate-700/80 rounded-xl bg-slate-800/40 p-1">
+          <p class="text-[11px] text-slate-500 mt-1">Supported formats: PNG, JPG, JPEG, WEBP</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Name -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-1.5">Full Name <span class="text-rose-400">*</span></label>
+      <input type="text" name="name" required placeholder="e.g. John Doe" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+    </div>
+
+    <!-- Email Address / Username -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-1.5">Email Address / Username <span class="text-rose-400">*</span></label>
+      <input type="email" name="email" required placeholder="user@domain.com" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+    </div>
+
+    <!-- Password -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-1.5">Password <span class="text-rose-400">*</span></label>
+      <div class="relative">
+        <input type="password" id="user-password" name="password" required placeholder="Enter password (minimum 6 characters)" minlength="6" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all pr-10">
+        <button type="button" onclick="togglePasswordVisibility('user-password', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-white transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Grid: Role & Status -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-slate-300 font-semibold mb-1.5">Account Role <span class="text-rose-400">*</span></label>
+        <select name="role" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+          <option value="Customer">Customer</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-slate-300 font-semibold mb-1.5">Account Status <span class="text-rose-400">*</span></label>
+        <select name="status" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+      <a href="{{ url_for('admin.admin_users') }}" class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold hover:text-white hover:bg-slate-700 transition">Cancel</a>
+      <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg shadow-emerald-500/25 hover:from-emerald-500 hover:to-teal-500 transition">
+        Create User
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+function previewUserAvatar(input) {
+  const preview = document.getElementById('avatar-preview');
+  const placeholder = document.getElementById('avatar-placeholder');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.classList.remove('hidden');
+      if (placeholder) placeholder.classList.add('hidden');
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function togglePasswordVisibility(inputId, button) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+  } else {
+    input.type = 'password';
+  }
+}
+</script>
+{% endblock %}

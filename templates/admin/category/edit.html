@@ -33,22 +33,23 @@
     <!-- Current Image Preview & Upload (varchar 255) -->
     <div class="space-y-3">
       <label class="block text-slate-300 font-semibold mb-1.5">Category Image</label>
-      {% if category.image %}
-        <div class="flex items-center gap-3 p-3 bg-slate-800/60 rounded-xl border border-slate-700">
-          <img src="{{ category.image }}" alt="{{ category.name }}" class="w-14 h-14 object-cover rounded-lg border border-slate-600">
-          <div>
-            <p class="text-slate-300 font-medium">Current Image</p>
-            <p class="text-slate-500 text-[11px] truncate max-w-md">{{ category.image }}</p>
-          </div>
+      <div class="flex items-center gap-3 p-3 bg-slate-800/60 rounded-xl border border-slate-700">
+        <img src="{{ category.image or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png' }}" 
+             alt="{{ category.name }}" 
+             onerror="this.onerror=null;this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png';"
+             class="w-14 h-14 object-cover rounded-lg border border-slate-600">
+        <div>
+          <p class="text-slate-300 font-medium">Current Image</p>
+          <p class="text-slate-500 text-[11px] truncate max-w-md">{{ category.image or 'Using default placeholder' }}</p>
         </div>
-      {% endif %}
-      <div class="p-4 rounded-xl border border-dashed border-slate-700 bg-slate-800/40 text-center hover:border-slate-600 transition">
-        <input type="file" name="image" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
-        <p class="text-[11px] text-slate-500 mt-2">Upload new image file to replace current image</p>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-slate-500 text-[11px]">OR URL:</span>
-        <input type="url" name="image_url" value="{{ category.image or '' }}" placeholder="https://example.com/category.jpg" class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all">
+      <div class="p-4 rounded-xl border border-dashed border-slate-700 bg-slate-800/40 text-center hover:border-slate-600 transition">
+        <div id="new-image-preview-container" class="hidden mb-3">
+          <p class="text-[11px] text-blue-400 mb-1.5 font-medium">New Image Preview:</p>
+          <img id="new-image-preview" src="#" alt="New Image Preview" class="w-20 h-20 mx-auto object-cover rounded-xl border border-slate-600 shadow-md">
+        </div>
+        <input type="file" name="image" accept="image/*" onchange="previewEditCategoryImage(this)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+        <p class="text-[11px] text-slate-500 mt-2">Upload new image file to replace current image (PNG, JPG, JPEG, WEBP)</p>
       </div>
     </div>
 
@@ -67,4 +68,21 @@
     </div>
   </form>
 </div>
+
+<script>
+  function previewEditCategoryImage(input) {
+    const previewContainer = document.getElementById('new-image-preview-container');
+    const preview = document.getElementById('new-image-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        previewContainer.classList.remove('hidden');
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      previewContainer.classList.add('hidden');
+    }
+  }
+</script>
 {% endblock %}

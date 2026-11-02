@@ -1,0 +1,565 @@
+{% extends "front/base.html" %}
+
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<section class="auth-section">
+  <div class="auth-wrapper">
+
+    <!-- Checkout Alert Notice (If user was checking out) -->
+    {% if request.args.get('next') and 'checkout' in request.args.get('next') %}
+      <div class="checkout-notice-box">
+        <span class="notice-icon">🛍️</span>
+        <div>
+          <strong>Checkout in Progress:</strong>
+          <p>Please sign in or create an account to proceed to payment and secure your order.</p>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Unified Card -->
+    <div class="auth-card">
+      
+      <!-- Brand & Header -->
+      <div class="auth-card-head">
+        <span class="auth-portal-badge">SV7@168 Customer & Admin Portal</span>
+        <h2 id="auth-main-heading" class="auth-title">Welcome Back</h2>
+        <p id="auth-main-subheading" class="auth-subtitle">Sign in to access your account or admin dashboard</p>
+      </div>
+
+      <!-- Segmented Tab Switcher -->
+      <div class="auth-tab-bar">
+        <button type="button" id="tab-login-btn" class="auth-tab-btn active" onclick="switchAuthTab('login')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          Sign In
+        </button>
+        <button type="button" id="tab-register-btn" class="auth-tab-btn" onclick="switchAuthTab('register')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+          Create Account
+        </button>
+      </div>
+
+      <!-- 1. LOGIN FORM FLOW -->
+      <form id="form-login" class="auth-form-panel" method="post" action="{{ url_for('user.login', next=request.args.get('next')) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if request.args.get('next') %}
+          <input type="hidden" name="next" value="{{ request.args.get('next') }}">
+        {% endif %}
+
+        <div class="auth-field-group">
+          <label class="auth-label" for="login-email">Email Address</label>
+          <div class="auth-input-wrapper">
+            <svg class="auth-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <input type="email" id="login-email" name="email" required placeholder="admin@techey.tech or your email" class="auth-modern-input">
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <div class="label-with-aside">
+            <label class="auth-label" for="login-password">Password</label>
+            <a href="{{ url_for('user.reset_password') }}" class="auth-link-sm">Forgot password?</a>
+          </div>
+          <div class="auth-input-wrapper">
+            <svg class="auth-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <input type="password" id="login-password" name="password" required placeholder="••••••••" class="auth-modern-input">
+            <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('login-password')" title="Show / Hide Password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="auth-primary-btn">
+          Sign In to Account
+        </button>
+
+        <div class="auth-footer-toggle">
+          <span>Don't have an account yet?</span>
+          <button type="button" class="auth-toggle-link" onclick="switchAuthTab('register')">Create account</button>
+        </div>
+      </form>
+
+      <!-- 2. REGISTRATION FORM FLOW -->
+      <form id="form-register" class="auth-form-panel" style="display: none;" method="post" enctype="multipart/form-data" action="{{ url_for('user.register', next=request.args.get('next')) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if request.args.get('next') %}
+          <input type="hidden" name="next" value="{{ request.args.get('next') }}">
+        {% endif %}
+
+        <!-- Profile Avatar Upload with preview -->
+        <div class="avatar-upload-block">
+          <label class="auth-label" style="margin-bottom: 6px;">Profile Picture</label>
+          <div class="avatar-circle-wrapper">
+            <img id="unified-avatar-preview" 
+                 src="https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png" 
+                 alt="Profile Preview" 
+                 class="avatar-circle-img">
+            <label for="unified-profile-input" class="avatar-camera-btn" title="Choose photo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </label>
+          </div>
+          <input type="file" id="unified-profile-input" name="image" accept="image/*" style="display: none;" onchange="previewUnifiedAvatar(this)">
+          <span class="avatar-hint-text">Click the camera badge to upload a profile photo</span>
+        </div>
+
+        <div class="auth-field-group">
+          <label class="auth-label" for="reg-name">Full Name <span class="req-star">*</span></label>
+          <div class="auth-input-wrapper">
+            <svg class="auth-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <input type="text" id="reg-name" name="name" required placeholder="e.g. Sokha Chan" class="auth-modern-input">
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label class="auth-label" for="reg-email">Email Address <span class="req-star">*</span></label>
+          <div class="auth-input-wrapper">
+            <svg class="auth-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <input type="email" id="reg-email" name="email" required placeholder="customer@example.com" class="auth-modern-input">
+          </div>
+        </div>
+
+        <div class="auth-grid-passwords">
+          <div class="auth-field-group">
+            <label class="auth-label" for="reg-pwd">Password <span class="req-star">*</span></label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <input type="password" id="reg-pwd" name="password" minlength="6" required placeholder="Min 6 chars" class="auth-modern-input">
+              <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('reg-pwd')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-field-group">
+            <label class="auth-label" for="reg-confirm">Confirm Password <span class="req-star">*</span></label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <input type="password" id="reg-confirm" name="confirm_password" minlength="6" required placeholder="Repeat password" class="auth-modern-input">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="auth-primary-btn">
+          Create Account & Continue
+        </button>
+
+        <div class="auth-footer-toggle">
+          <span>Already have an account?</span>
+          <button type="button" class="auth-toggle-link" onclick="switchAuthTab('login')">Sign in</button>
+        </div>
+      </form>
+
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* ==========================================================================
+     UNIFIED AUTHENTICATION STYLES (Plus Jakarta Sans)
+     ========================================================================== */
+  .auth-section {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    background: #f8fafc;
+  }
+
+  .auth-wrapper {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Checkout Notice Alert */
+  .checkout-notice-box {
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: #92400e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  .notice-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .checkout-notice-box strong {
+    color: #78350f;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .checkout-notice-box p {
+    margin: 0;
+    color: #92400e;
+    line-height: 1.4;
+  }
+
+  /* Auth Card */
+  .auth-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 32px 28px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  }
+
+  .auth-card-head {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+
+  .auth-portal-badge {
+    display: inline-block;
+    color: #078678;
+    background: #e6f6f4;
+    font-size: 0.725rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+
+  .auth-title {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 4px 0 6px;
+    letter-spacing: -0.02em;
+  }
+
+  .auth-subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* Segmented Tab Switcher */
+  .auth-tab-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+
+  .auth-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+  }
+
+  .auth-tab-btn:hover {
+    color: #0f172a;
+  }
+
+  .auth-tab-btn.active {
+    background: #ffffff;
+    color: #078678;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Forms */
+  .auth-form-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .auth-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .auth-label {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  .req-star {
+    color: #e11d48;
+  }
+
+  .label-with-aside {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .auth-link-sm {
+    font-size: 0.775rem;
+    color: #078678;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .auth-link-sm:hover {
+    text-decoration: underline;
+  }
+
+  .auth-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .auth-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+  .auth-modern-input {
+    width: 100%;
+    padding: 12px 42px 12px 42px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #ffffff;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .auth-modern-input:focus {
+    outline: none;
+    border-color: #078678;
+    box-shadow: 0 0 0 3px rgba(7, 134, 120, 0.15);
+  }
+
+  .pwd-toggle-btn {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+
+  .pwd-toggle-btn:hover {
+    color: #0f172a;
+  }
+
+  .auth-grid-passwords {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .auth-primary-btn {
+    background: linear-gradient(135deg, #078678 0%, #056b61 100%);
+    color: #ffffff;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(7, 134, 120, 0.25);
+    margin-top: 6px;
+    font-family: inherit;
+  }
+
+  .auth-primary-btn:hover {
+    background: linear-gradient(135deg, #099b8b 0%, #078678 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(7, 134, 120, 0.35);
+  }
+
+  .auth-footer-toggle {
+    margin-top: 14px;
+    padding-top: 18px;
+    border-top: 1px solid #f1f5f9;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .auth-toggle-link {
+    background: transparent;
+    border: none;
+    color: #078678;
+    font-weight: 800;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    font-family: inherit;
+    text-decoration: none;
+  }
+
+  .auth-toggle-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Avatar upload circle */
+  .avatar-upload-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .avatar-circle-wrapper {
+    position: relative;
+    width: 88px;
+    height: 88px;
+  }
+
+  .avatar-circle-img {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #078678;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .avatar-camera-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #078678;
+    color: #ffffff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.15s;
+  }
+
+  .avatar-camera-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .avatar-hint-text {
+    font-size: 0.725rem;
+    color: #64748b;
+    margin-top: 6px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 520px) {
+    .auth-card {
+      padding: 24px 18px;
+    }
+    .auth-grid-passwords {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  let activeTab = '{{ mode or "login" }}';
+
+  function switchAuthTab(targetTab) {
+    activeTab = targetTab;
+    const tabLoginBtn = document.getElementById('tab-login-btn');
+    const tabRegisterBtn = document.getElementById('tab-register-btn');
+    const formLogin = document.getElementById('form-login');
+    const formRegister = document.getElementById('form-register');
+    const mainHeading = document.getElementById('auth-main-heading');
+    const mainSubheading = document.getElementById('auth-main-subheading');
+
+    if (targetTab === 'login') {
+      tabLoginBtn.classList.add('active');
+      tabRegisterBtn.classList.remove('active');
+      formLogin.style.display = 'flex';
+      formRegister.style.display = 'none';
+      if (mainHeading) mainHeading.textContent = 'Welcome Back';
+      if (mainSubheading) mainSubheading.textContent = 'Sign in to access your account or admin dashboard';
+    } else {
+      tabRegisterBtn.classList.add('active');
+      tabLoginBtn.classList.remove('active');
+      formRegister.style.display = 'flex';
+      formLogin.style.display = 'none';
+      if (mainHeading) mainHeading.textContent = 'Create Account';
+      if (mainSubheading) mainSubheading.textContent = 'Register to enjoy fast checkout and order tracking';
+    }
+
+    // Update browser history URL without page reload if desired
+    const url = new URL(window.location);
+    url.searchParams.set('mode', targetTab);
+    window.history.replaceState({}, '', url);
+  }
+
+  function previewUnifiedAvatar(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('unified-avatar-preview').src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function togglePasswordVisibility(fieldId) {
+    const input = document.getElementById(fieldId);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  // Pre-initialize tab on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const modeParam = urlParams.get('mode');
+    if (modeParam === 'register' || activeTab === 'register' || window.location.pathname.includes('register')) {
+      switchAuthTab('register');
+    } else {
+      switchAuthTab('login');
+    }
+  });
+</script>
+{% endblock %}

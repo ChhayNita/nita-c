@@ -1,0 +1,224 @@
+{% extends "front/base.html" %}
+
+{% block content %}
+<section class="container section">
+  <div style="max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 2rem;">
+    
+    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 1rem;">
+      <div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #3b82f6; letter-spacing: 0.05em;">Checkout</div>
+        <h1 style="margin: 0.25rem 0 0; font-size: 1.75rem; font-weight: 800;">Complete Your Order</h1>
+      </div>
+      <a href="{{ url_for('user.cart') }}" style="color: #64748b; font-size: 0.875rem; text-decoration: none;">← Back to Cart</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; align-items: start;">
+      
+      <!-- Checkout Form -->
+      <form class="form-panel" method="post" action="{{ url_for('user.checkout') }}" style="display: flex; flex-direction: column; gap: 1.25rem; background: var(--panel-bg, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 1rem; padding: 1.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- 1. Fulfillment Option: Pickup vs Delivery -->
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: #1e293b;">
+            Choose Fulfillment Option
+          </label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <label id="opt-delivery" style="border: 2px solid #3b82f6; background: #eff6ff; border-radius: 0.75rem; padding: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+              <input type="radio" name="delivery_type" value="delivery" checked onchange="toggleFulfillment('delivery')" style="accent-color: #2563eb;">
+              <div>
+                <strong style="display: block; font-size: 0.875rem; color: #1e293b;">Delivery</strong>
+                <span style="font-size: 0.75rem; color: #64748b;">Home or Office</span>
+              </div>
+            </label>
+
+            <label id="opt-pickup" style="border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 0.75rem; padding: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+              <input type="radio" name="delivery_type" value="pickup" onchange="toggleFulfillment('pickup')" style="accent-color: #2563eb;">
+              <div>
+                <strong style="display: block; font-size: 0.875rem; color: #1e293b;">Store Pickup</strong>
+                <span style="font-size: 0.75rem; color: #64748b;">Collect at branch</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. Customer Information -->
+        <div style="border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+          <h3 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 700; color: #1e293b;">Customer Details</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <label class="field" style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; font-weight: 600; color: #334155;">
+              Full Name <span style="color: #ef4444;">*</span>
+              <input type="text" name="name" required placeholder="e.g. Sokha Chan" style="padding: 0.65rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.875rem;">
+            </label>
+
+            <label class="field" style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; font-weight: 600; color: #334155;">
+              Phone Number <span style="color: #ef4444;">*</span>
+              <input type="tel" name="phone" required placeholder="012 345 678" style="padding: 0.65rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.875rem;">
+            </label>
+
+            <label class="field" style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; font-weight: 600; color: #334155;">
+              Email Address (Optional)
+              <input type="email" name="email" placeholder="customer@example.com" style="padding: 0.65rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.875rem;">
+            </label>
+
+            <!-- Delivery Address field (hidden when Pickup is selected) -->
+            <div id="address-block">
+              <label class="field" style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; font-weight: 600; color: #334155;">
+                Shipping Address <span style="color: #ef4444;">*</span>
+                <textarea name="address" id="shipping-address" rows="3" placeholder="Street, Khan/District, City, landmarks..." style="padding: 0.65rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit;"></textarea>
+              </label>
+            </div>
+
+            <!-- Store Pickup Info Box (shown when Pickup is selected) -->
+            <div id="pickup-block" style="display: none; padding: 0.85rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem; font-size: 0.8rem; color: #92400e;">
+              <strong>Pickup Branch:</strong> SV7 Store Main Branch, Phnom Penh.<br>
+              <span style="color: #b45309;">Please present your order number and phone number when picking up.</span>
+            </div>
+
+            <label class="field" style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; font-weight: 600; color: #334155;">
+              Order Notes (Optional)
+              <textarea name="notes" rows="2" placeholder="Special delivery instructions or requests..." style="padding: 0.65rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit;"></textarea>
+            </label>
+          </div>
+        </div>
+
+        <!-- 3. Payment Method: KHQR vs Cash -->
+        <div style="border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+          <h3 style="margin: 0 0 0.75rem; font-size: 1rem; font-weight: 700; color: #1e293b;">Payment Method</h3>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Pay with KHQR -->
+            <label id="pay-khqr" style="border: 2px solid #e11d48; background: #fff1f2; border-radius: 0.75rem; padding: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <input type="radio" name="payment_method" value="khqr" checked onchange="togglePayment('khqr')" style="accent-color: #e11d48;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <strong style="font-size: 0.9rem; color: #881337;">Pay with KHQR</strong>
+                    <span style="background: #e11d48; color: white; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.4rem; rounded: 0.25rem; border-radius: 4px;">BAKONG</span>
+                  </div>
+                  <span style="font-size: 0.75rem; color: #9f1239;">Scan with Bakong, ABA Mobile, Wing, ACLEDA, or any mobile bank</span>
+                </div>
+              </div>
+              <span style="font-size: 1.1rem;">📱</span>
+            </label>
+
+            <!-- Cash on Delivery / Cash on Pickup -->
+            <label id="pay-cash" style="border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 0.75rem; padding: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <input type="radio" name="payment_method" value="cash" onchange="togglePayment('cash')" style="accent-color: #2563eb;">
+                <div>
+                  <strong style="font-size: 0.9rem; color: #1e293b;" id="cash-label">Cash on Delivery</strong>
+                  <span style="font-size: 0.75rem; color: #64748b; display: block;">Pay in cash when order is received</span>
+                </div>
+              </div>
+              <span style="font-size: 1.1rem;">💵</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-order-btn" style="background: linear-gradient(135deg, #e11d48, #be123c); color: white; padding: 0.85rem 1.5rem; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25); margin-top: 0.5rem;">
+          Proceed to Pay with KHQR (${{ "%.2f"|format(total) }})
+        </button>
+      </form>
+
+      <!-- Order Summary Card -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.75rem;">
+        <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.05em;">Order Summary</div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin: 0.5rem 0 1.25rem;">
+          <h2 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: #0f172a;">${{ "%.2f"|format(total) }}</h2>
+          <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">{{ items|length }} product{{ 's' if items|length != 1 else '' }}</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+          {% for item in items %}
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; max-width: 75%;">
+                <span style="background: #e2e8f0; border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.75rem; font-weight: 700;">{{ item.quantity }}x</span>
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #334155;">{{ item.product.title }}</span>
+              </div>
+              <span style="font-weight: 700; color: #0f172a; font-family: monospace;">${{ "%.2f"|format(item.subtotal) }}</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px dashed #cbd5e1; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; color: #64748b;">
+            <span>Subtotal</span>
+            <span style="font-family: monospace;">${{ "%.2f"|format(total) }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; color: #64748b;">
+            <span>Shipping</span>
+            <span style="color: #10b981; font-weight: 700;">FREE</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 1.05rem; color: #0f172a; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0;">
+            <span>Total Payable</span>
+            <span style="color: #2563eb; font-family: monospace;">${{ "%.2f"|format(total) }} USD</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem; padding: 0.85rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.75rem; display: flex; align-items: center; gap: 0.65rem;">
+          <span style="font-size: 1.25rem;">🔒</span>
+          <span style="font-size: 0.75rem; color: #1e40af;">Secured with National Bank of Cambodia Bakong KHQR standard</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  function toggleFulfillment(type) {
+    const optDelivery = document.getElementById('opt-delivery');
+    const optPickup = document.getElementById('opt-pickup');
+    const addrBlock = document.getElementById('address-block');
+    const pickupBlock = document.getElementById('pickup-block');
+    const shippingAddrInput = document.getElementById('shipping-address');
+    const cashLabel = document.getElementById('cash-label');
+
+    if (type === 'delivery') {
+      optDelivery.style.border = '2px solid #3b82f6';
+      optDelivery.style.background = '#eff6ff';
+      optPickup.style.border = '1px solid #cbd5e1';
+      optPickup.style.background = '#f8fafc';
+      addrBlock.style.display = 'block';
+      pickupBlock.style.display = 'none';
+      shippingAddrInput.required = true;
+      if (cashLabel) cashLabel.textContent = 'Cash on Delivery';
+    } else {
+      optPickup.style.border = '2px solid #f59e0b';
+      optPickup.style.background = '#fffbeb';
+      optDelivery.style.border = '1px solid #cbd5e1';
+      optDelivery.style.background = '#f8fafc';
+      addrBlock.style.display = 'none';
+      pickupBlock.style.display = 'block';
+      shippingAddrInput.required = false;
+      if (cashLabel) cashLabel.textContent = 'Pay on Pickup (at store)';
+    }
+  }
+
+  function togglePayment(type) {
+    const payKhqr = document.getElementById('pay-khqr');
+    const payCash = document.getElementById('pay-cash');
+    const submitBtn = document.getElementById('submit-order-btn');
+
+    if (type === 'khqr') {
+      payKhqr.style.border = '2px solid #e11d48';
+      payKhqr.style.background = '#fff1f2';
+      payCash.style.border = '1px solid #cbd5e1';
+      payCash.style.background = '#f8fafc';
+      submitBtn.style.background = 'linear-gradient(135deg, #e11d48, #be123c)';
+      submitBtn.style.boxShadow = '0 4px 12px rgba(225, 29, 72, 0.25)';
+      submitBtn.textContent = 'Proceed to Pay with KHQR (${{ "%.2f"|format(total) }})';
+    } else {
+      payCash.style.border = '2px solid #2563eb';
+      payCash.style.background = '#eff6ff';
+      payKhqr.style.border = '1px solid #cbd5e1';
+      payKhqr.style.background = '#f8fafc';
+      submitBtn.style.background = 'linear-gradient(135deg, #2563eb, #1d4ed8)';
+      submitBtn.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.25)';
+      submitBtn.textContent = 'Confirm and Place Order (${{ "%.2f"|format(total) }})';
+    }
+  }
+</script>
+{% endblock %}

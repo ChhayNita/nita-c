@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | SV7 Store</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f6ff',
+              100: '#e0edff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom Admin Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="h-full antialiased overflow-hidden selection:bg-blue-500 selection:text-white bg-slate-950">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebar-backdrop" onclick="toggleAdminSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden lg:hidden transition-opacity"></div>
+
+  <div class="h-screen flex overflow-hidden bg-slate-950">
+
+    <!-- Sidebar Navigation Menu Include -->
+    {% include 'admin/share/menu.html' %}
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto bg-slate-900/90">
+
+      <!-- Header Include -->
+      {% include 'admin/share/header.html' %}
+
+      <!-- Main Page Content Block -->
+      <main class="p-4 sm:p-6 space-y-6 flex-1">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="space-y-2 mb-4">
+              {% for category, message in messages %}
+                <div class="p-4 rounded-xl text-xs font-semibold flex items-center justify-between shadow-lg {% if category == 'danger' or category == 'error' %}bg-rose-500/10 border border-rose-500/30 text-rose-300{% elif category == 'warning' %}bg-amber-500/10 border border-amber-500/30 text-amber-300{% elif category == 'success' %}bg-emerald-500/10 border border-emerald-500/30 text-emerald-300{% else %}bg-blue-500/10 border border-blue-500/30 text-blue-300{% endif %}">
+                  <div class="flex items-center gap-2">
+                    {% if category == 'danger' or category == 'error' %}
+                      <svg class="w-4 h-4 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {% elif category == 'warning' %}
+                      <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    {% elif category == 'success' %}
+                      <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {% else %}
+                      <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {% endif %}
+                    <span>{{ message }}</span>
+                  </div>
+                  <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white">✕</button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </main>
+
+    </div>
+  </div>
+
+  <script>
+    function toggleAdminSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar) {
+        sidebar.classList.toggle('-translate-x-full');
+      }
+      if (backdrop) {
+        backdrop.classList.toggle('hidden');
+      }
+    }
+
+    function toggleOrderMenu() {
+      const submenu = document.getElementById('order-submenu');
+      const arrow = document.getElementById('order-arrow');
+      if (submenu) {
+        submenu.classList.toggle('hidden');
+      }
+      if (arrow) {
+        arrow.classList.toggle('rotate-180');
+      }
+    }
+  </script>
+
+  {% block modals %}{% endblock %}
+</body>
+</html>

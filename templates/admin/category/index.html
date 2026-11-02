@@ -37,13 +37,10 @@
           {% for c in categories %}
           <tr class="hover:bg-slate-800/40 transition category-row" data-name="{{ c.name|lower }}">
             <td class="py-3.5 px-4 flex items-center gap-3">
-              {% if c.image %}
-                <img src="{{ c.image }}" alt="{{ c.name }}" class="w-10 h-10 object-cover rounded-lg bg-slate-800 border border-slate-700 shadow-sm shrink-0">
-              {% else %}
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold shrink-0">
-                  {{ c.name[:2]|upper }}
-                </div>
-              {% endif %}
+              <img src="{{ c.image or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png' }}" 
+                   alt="{{ c.name }}" 
+                   onerror="this.onerror=null;this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png';" 
+                   class="w-10 h-10 object-cover rounded-lg bg-slate-800 border border-slate-700 shadow-sm shrink-0">
               <div>
                 <p class="font-medium text-white truncate text-xs category-name">{{ c.name }}</p>
                 <p class="text-[11px] text-slate-500 font-mono">ID: #{{ c.id }}</p>

@@ -100,6 +100,17 @@
         backdrop.classList.toggle('hidden');
       }
     }
+
+    function toggleOrderMenu() {
+      const submenu = document.getElementById('order-submenu');
+      const arrow = document.getElementById('order-arrow');
+      if (submenu) {
+        submenu.classList.toggle('hidden');
+      }
+      if (arrow) {
+        arrow.classList.toggle('rotate-180');
+      }
+    }
   </script>
 
   {% block modals %}{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Page Header with Back Navigation -->
+<div class="flex items-center justify-between">
+  <div>
+    <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+      <a href="{{ url_for('admin.admin_categories') }}" class="hover:text-white transition">Categories</a>
+      <span>/</span>
+      <span class="text-blue-400 font-medium">Add New Category</span>
+    </div>
+    <h2 class="text-xl font-bold text-white tracking-tight">Create Category</h2>
+  </div>
+  <a href="{{ url_for('admin.admin_categories') }}" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    <span>Back to Categories</span>
+  </a>
+</div>
+
+<!-- Add Category Form Card -->
+<div class="max-w-2xl p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-6">
+  <form action="{{ url_for('admin.admin_category_add') }}" method="POST" enctype="multipart/form-data" class="space-y-5 text-xs">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <!-- Category Name (varchar 255 not null) -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-1.5">
+        Category Name <span class="text-rose-400">*</span>
+      </label>
+      <input type="text" name="name" maxlength="255" required placeholder="e.g. Electronics, Footwear, Fashion" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+    </div>
+
+    <!-- Category Image (varchar 255) -->
+    <div class="space-y-3">
+      <label class="block text-slate-300 font-semibold mb-1.5">
+        Category Image
+      </label>
+      <div class="p-4 rounded-xl border border-dashed border-slate-700 bg-slate-800/40 text-center hover:border-slate-600 transition">
+        <div id="image-preview-container" class="mb-3">
+          <p class="text-[11px] text-slate-400 mb-1.5">Preview (Default placeholder shown if no file selected):</p>
+          <img id="image-preview" src="https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png" alt="Category Preview" class="w-24 h-24 mx-auto object-cover rounded-xl border border-slate-600 shadow-md">
+        </div>
+        <input type="file" name="image" id="category-file" accept="image/*" onchange="previewCategoryImage(this)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+        <p class="text-[11px] text-slate-500 mt-2">Upload PNG, JPG, JPEG, WEBP (Optional: default placeholder used if empty)</p>
+      </div>
+    </div>
+
+    <!-- Description (text) -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-1.5">Description</label>
+      <textarea name="description" rows="4" placeholder="Brief summary of what products belong in this category..." class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+      <a href="{{ url_for('admin.admin_categories') }}" class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold hover:text-white hover:bg-slate-700 transition">Cancel</a>
+      <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 transition">
+        Create Category
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const defaultPlaceholder = "https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png";
+  function previewCategoryImage(input) {
+    const preview = document.getElementById('image-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = defaultPlaceholder;
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Top Header & Search Controls -->
+<div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+  <div class="flex items-center gap-3 w-full md:w-auto">
+    <!-- Search Bar -->
+    <div class="relative flex-1 md:w-80">
+      <input type="text" id="category-search" oninput="filterCategories()" placeholder="Filter categories by name..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 pl-9">
+      <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    </div>
+  </div>
+
+  <!-- Action Button -->
+  <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+    <a href="{{ url_for('admin.admin_category_add') }}" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-indigo-500 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      <span>Add Category</span>
+    </a>
+  </div>
+</div>
+
+<!-- Categories Table Card -->
+<div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-xs" id="category-table">
+      <thead>
+        <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+          <th class="py-3 px-4">Category</th>
+          <th class="py-3 px-4">Description</th>
+          <th class="py-3 px-4 text-center">Products</th>
+          <th class="py-3 px-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800/60 text-slate-300" id="category-table-body">
+        {% if categories %}
+          {% for c in categories %}
+          <tr class="hover:bg-slate-800/40 transition category-row" data-name="{{ c.name|lower }}">
+            <td class="py-3.5 px-4 flex items-center gap-3">
+              <img src="{{ c.image or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png' }}" 
+                   alt="{{ c.name }}" 
+                   onerror="this.onerror=null;this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png';" 
+                   class="w-10 h-10 object-cover rounded-lg bg-slate-800 border border-slate-700 shadow-sm shrink-0">
+              <div>
+                <p class="font-medium text-white truncate text-xs category-name">{{ c.name }}</p>
+                <p class="text-[11px] text-slate-500 font-mono">ID: #{{ c.id }}</p>
+              </div>
+            </td>
+            <td class="py-3.5 px-4 text-slate-400 max-w-sm">
+              <span class="line-clamp-2">{{ c.description or 'No description provided.' }}</span>
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                {{ c.products|length }} product{{ 's' if c.products|length != 1 else '' }}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="{{ url_for('admin.admin_category_edit', category_id=c.id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition" title="Edit Category">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </a>
+                <form action="{{ url_for('admin.admin_category_delete', category_id=c.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete category \'{{ c.name }}\'?');" class="inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition cursor-pointer" title="Delete Category">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="4" class="py-8 text-center text-slate-500">
+              No categories found. Click "Add Category" to create one.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function filterCategories() {
+    const query = document.getElementById('category-search').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.category-row');
+    rows.forEach(row => {
+      const name = row.getAttribute('data-name') || '';
+      if (!query || name.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+</script>
+{% endblock %}

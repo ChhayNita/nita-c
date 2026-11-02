@@ -19,6 +19,9 @@ def admin_products():
     )
 
 
+DEFAULT_PRODUCT_IMAGE = "https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png"
+
+
 @admin_bp.route("/products/add", methods=["GET", "POST"])
 @admin_required
 def admin_product_add():
@@ -31,7 +34,6 @@ def admin_product_add():
         price = request.form.get("price", "0.00").strip()
         stock = request.form.get("stock", "50").strip()
         description = request.form.get("description", "").strip()
-        thumbnail_url = request.form.get("thumbnail_url", "").strip()
 
         # Validation
         if not name:
@@ -51,15 +53,12 @@ def admin_product_add():
             flash("Invalid numeric value for cost, price, or stock.", "danger")
             return redirect(url_for("admin.admin_product_add"))
 
-        # Process main thumbnail image
+        # Process main thumbnail image via formfile
         thumbnail_path = None
         if "thumbnail" in request.files:
             thumb_file = request.files["thumbnail"]
             if thumb_file and thumb_file.filename:
                 thumbnail_path = upload_image(thumb_file)
-
-        if not thumbnail_path and thumbnail_url:
-            thumbnail_path = thumbnail_url
 
         # Create Product
         product = Product(
@@ -75,7 +74,7 @@ def admin_product_add():
         db.session.flush()  # Generate product.id for ProductImage
 
         # =========================================================================
-        # Process Multiple Product Images ("img in product can post with many")
+        # Process Multiple Product Images via formfile
         # =========================================================================
         uploaded_images_count = 0
         if "images" in request.files:
@@ -91,16 +90,9 @@ def admin_product_add():
                         if not product.thumbnail:
                             product.thumbnail = saved_path
 
-        # Also support comma or newline-separated multiple image URLs
-        gallery_urls = request.form.get("gallery_urls", "").strip()
-        if gallery_urls:
-            urls = [u.strip() for u in gallery_urls.replace("\n", ",").split(",") if u.strip()]
-            for u in urls:
-                product_image = ProductImage(ProductId=product.id, name=u)
-                db.session.add(product_image)
-                uploaded_images_count += 1
-                if not product.thumbnail:
-                    product.thumbnail = u
+        # If still no thumbnail, fallback to default placeholder
+        if not product.thumbnail:
+            product.thumbnail = DEFAULT_PRODUCT_IMAGE
 
         db.session.commit()
         flash(f'Product "{name}" created successfully with {uploaded_images_count} image(s)!', "success")
@@ -122,7 +114,6 @@ def admin_product_edit(product_id):
         price = request.form.get("price", "0.00").strip()
         stock = request.form.get("stock", "0").strip()
         description = request.form.get("description", "").strip()
-        thumbnail_url = request.form.get("thumbnail_url", "").strip()
 
         if not name:
             flash("Product name is required.", "danger")
@@ -139,7 +130,7 @@ def admin_product_edit(product_id):
             flash("Invalid input values provided.", "danger")
             return redirect(url_for("admin.admin_product_edit", product_id=product.id))
 
-        # Check new thumbnail upload
+        # Check new thumbnail upload via formfile
         if "thumbnail" in request.files:
             thumb_file = request.files["thumbnail"]
             if thumb_file and thumb_file.filename:
@@ -147,10 +138,7 @@ def admin_product_edit(product_id):
                 if new_thumb:
                     product.thumbnail = new_thumb
 
-        if thumbnail_url:
-            product.thumbnail = thumbnail_url
-
-        # Check additional multiple image uploads
+        # Check additional multiple image uploads via formfile
         if "images" in request.files:
             image_files = request.files.getlist("images")
             for img_file in image_files:
@@ -159,14 +147,6 @@ def admin_product_edit(product_id):
                     if saved_path:
                         product_image = ProductImage(ProductId=product.id, name=saved_path)
                         db.session.add(product_image)
-
-        # Check additional image URLs
-        gallery_urls = request.form.get("gallery_urls", "").strip()
-        if gallery_urls:
-            urls = [u.strip() for u in gallery_urls.replace("\n", ",").split(",") if u.strip()]
-            for u in urls:
-                product_image = ProductImage(ProductId=product.id, name=u)
-                db.session.add(product_image)
 
         db.session.commit()
         flash(f'Product "{product.name}" updated successfully!', "success")

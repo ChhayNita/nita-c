@@ -1,0 +1,194 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Page Header with Back Navigation -->
+<div class="flex items-center justify-between">
+  <div>
+    <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+      <a href="{{ url_for('admin.admin_products') }}" class="hover:text-white transition">Product Catalog</a>
+      <span>/</span>
+      <span class="text-blue-400 font-medium">Add New Product</span>
+    </div>
+    <h2 class="text-xl font-bold text-white tracking-tight">Create Product</h2>
+  </div>
+  <a href="{{ url_for('admin.admin_products') }}" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    <span>Back to Products</span>
+  </a>
+</div>
+
+<!-- Add Product Form Card -->
+<div class="max-w-3xl p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-6">
+  <form action="{{ url_for('admin.admin_product_add') }}" method="POST" enctype="multipart/form-data" class="space-y-5 text-xs">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <!-- Product Name (varchar 255 not null) -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-1.5">
+        Product Name <span class="text-rose-400">*</span>
+      </label>
+      <input type="text" name="name" maxlength="255" required placeholder="e.g. Sony WH-1000XM5 Wireless Headphones" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+    </div>
+
+    <!-- Grid: Category & Stock -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-slate-300 font-semibold mb-1.5">
+          Category (CategoryId) <span class="text-rose-400">*</span>
+        </label>
+        <select name="category_id" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+          <option value="" disabled selected>-- Select Category --</option>
+          {% for c in categories %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+        {% if not categories %}
+          <p class="text-[11px] text-amber-400 mt-1">No categories exist yet. <a href="{{ url_for('admin.admin_category_add') }}" class="underline">Create one first</a>.</p>
+        {% endif %}
+      </div>
+
+      <div>
+        <label class="block text-slate-300 font-semibold mb-1.5">
+          Stock Quantity (Stock int) <span class="text-rose-400">*</span>
+        </label>
+        <input type="number" name="stock" value="50" min="0" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+      </div>
+    </div>
+
+    <!-- Grid: Cost & Price (decimal 10,2) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-slate-300 font-semibold mb-1.5">
+          Cost Price ($ Cost decimal 10,2)
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-2.5 text-slate-400">$</span>
+          <input type="number" step="0.01" min="0" name="cost" placeholder="0.00" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-8 pr-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-slate-300 font-semibold mb-1.5">
+          Selling Price ($ Price decimal 10,2) <span class="text-rose-400">*</span>
+        </label>
+        <div class="relative">
+          <span class="absolute left-3 top-2.5 text-slate-400">$</span>
+          <input type="number" step="0.01" min="0" name="price" required placeholder="0.00" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-8 pr-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Thumbnail Image (varchar 255) -->
+    <div class="p-4 rounded-xl border border-slate-700 bg-slate-800/30 space-y-3">
+      <div class="flex items-center justify-between">
+        <label class="block text-slate-200 font-semibold">
+          Main Thumbnail Image (thumbnail)
+        </label>
+        <span class="text-[11px] text-slate-400">Primary display image</span>
+      </div>
+      <div>
+        <div id="thumb-preview-container" class="mb-3">
+          <p class="text-[11px] text-slate-400 mb-1.5">Thumbnail Preview (Default placeholder used if empty):</p>
+          <img id="thumb-preview" src="https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png" alt="Thumbnail Preview" class="w-24 h-24 object-cover rounded-xl border border-slate-600 shadow-md">
+        </div>
+        <input type="file" name="thumbnail" id="product-thumb-file" accept="image/*" onchange="previewProductThumb(this)" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer border border-slate-700/80 rounded-xl bg-slate-800/40 p-1">
+        <p class="text-[11px] text-slate-500 mt-1.5">Upload PNG, JPG, JPEG, WEBP</p>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- Multiple Product Images Section (ProductImage fk not null)   -->
+    <!-- "img in product can post with many"                           -->
+    <!-- ============================================================= -->
+    <div class="p-4 rounded-xl border-2 border-dashed border-indigo-500/40 bg-indigo-950/10 space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <label class="block text-indigo-200 font-semibold text-xs">
+            Product Gallery (Post Many Images)
+          </label>
+        </div>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          Multiple Uploads Enabled
+        </span>
+      </div>
+      <p class="text-[11px] text-slate-400">
+        You can select and upload multiple images at once for this product. They will be saved to the <code class="text-indigo-300 font-mono">ProductImage</code> table.
+      </p>
+
+      <!-- Multiple File Input -->
+      <div>
+        <label class="block text-slate-300 text-[11px] font-medium mb-1">Select multiple files (Hold Ctrl/Shift to choose multiple):</label>
+        <input type="file" name="images" id="multi-images-input" multiple accept="image/*" onchange="previewMultiFiles(event)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gradient-to-r file:from-indigo-600 file:to-blue-600 file:text-white hover:file:from-indigo-500 hover:file:to-blue-500 cursor-pointer border border-slate-700/80 rounded-xl bg-slate-800/40 p-1">
+      </div>
+
+      <!-- Live Preview Container for Multiple Uploaded Files -->
+      <div id="multi-preview-container" class="hidden pt-2">
+        <p class="text-[11px] text-slate-300 font-medium mb-2" id="preview-count-label">Selected images:</p>
+        <div id="preview-thumbnails" class="flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+
+    <!-- Description (text) -->
+    <div>
+      <label class="block text-slate-300 font-semibold mb-1.5">Description (text)</label>
+      <textarea name="description" rows="4" placeholder="Detailed product specifications, features, and dimensions..." class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+      <a href="{{ url_for('admin.admin_products') }}" class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold hover:text-white hover:bg-slate-700 transition">Cancel</a>
+      <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 transition">
+        Create Product
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const defaultPlaceholder = "https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png";
+
+  function previewProductThumb(input) {
+    const preview = document.getElementById('thumb-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = defaultPlaceholder;
+    }
+  }
+
+  function previewMultiFiles(event) {
+    const container = document.getElementById('multi-preview-container');
+    const thumbnailsDiv = document.getElementById('preview-thumbnails');
+    const countLabel = document.getElementById('preview-count-label');
+    const files = event.target.files;
+
+    thumbnailsDiv.innerHTML = '';
+    if (files.length > 0) {
+      container.classList.remove('hidden');
+      countLabel.textContent = `Selected ${files.length} image(s) for upload:`;
+      Array.from(files).forEach((file, index) => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'relative group w-16 h-16 rounded-lg overflow-hidden border border-indigo-500/40 bg-slate-800 shadow-sm';
+            div.innerHTML = `
+              <img src="${e.target.result}" class="w-full h-full object-cover">
+              <span class="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] text-white text-center py-0.5 truncate px-1">#${index+1}</span>
+            `;
+            thumbnailsDiv.appendChild(div);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    } else {
+      container.classList.add('hidden');
+    }
+  }
+</script>
+{% endblock %}

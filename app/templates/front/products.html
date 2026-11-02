@@ -1,0 +1,21 @@
+{% extends "front/base.html" %}
+
+{% block content %}
+  <section class="container section">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Shop</div>
+        <h2>Products</h2>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <a class="{{ 'active' if not active_category else '' }}" href="{{ url_for('user.products') }}">All</a>
+      {% for category in categories %}
+        <a class="{{ 'active' if category == active_category else '' }}" href="{{ url_for('user.products', category=category) }}">{{ category }}</a>
+      {% endfor %}
+    </div>
+
+    {% include "front/share/product-grid.html" %}
+  </section>
+{% endblock %}

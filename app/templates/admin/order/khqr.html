@@ -1,0 +1,143 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Top Header & Breadcrumb -->
+<div class="flex items-center justify-between">
+  <div>
+    <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+      <a href="{{ url_for('admin.admin_orders') }}" class="hover:text-white transition">Orders</a>
+      <span>/</span>
+      <span class="text-rose-400 font-medium">Bakong KHQR Payments</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <h2 class="text-xl font-bold text-white tracking-tight">Pay with KHQR Orders</h2>
+      <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+        {{ orders|length }} Verified Bakong Transactions
+      </span>
+    </div>
+  </div>
+  <a href="{{ url_for('admin.admin_orders') }}" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition">
+    <span>View All Orders</span>
+  </a>
+</div>
+
+<!-- Sub-navigation Tabs -->
+<div class="p-4 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+  <div class="flex items-center gap-1.5 p-1 bg-slate-800/80 rounded-xl border border-slate-700/80 text-xs">
+    <a href="{{ url_for('admin.admin_orders') }}" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+      All ({{ stats.total }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_pickup') }}" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+      Pickup ({{ stats.pickup }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_khqr') }}" class="px-3.5 py-1.5 rounded-lg font-semibold bg-rose-600 text-white shadow-sm transition">
+      Pay with KHQR ({{ stats.khqr }})
+    </a>
+    <a href="{{ url_for('admin.admin_orders_delivery') }}" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+      Delivery ({{ stats.delivery }})
+    </a>
+  </div>
+
+  <form method="GET" action="{{ url_for('admin.admin_orders_khqr') }}" class="relative w-full md:w-72">
+    <input type="text" name="search" value="{{ search or '' }}" placeholder="Search KHQR MD5, order #..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-rose-500 pl-9">
+    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+  </form>
+</div>
+
+<!-- KHQR Account Info Banner -->
+<div class="p-4 rounded-2xl glass-panel border border-rose-500/20 bg-rose-950/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 font-bold text-sm">
+      KHQR
+    </div>
+    <div>
+      <p class="text-xs text-white font-bold">Bakong Merchant Account: <span class="font-mono text-rose-300">chey_kimrith@bkrt</span></p>
+      <p class="text-[11px] text-slate-400">All orders listed here have been verified via National Bank of Cambodia (NBC) Bakong API.</p>
+    </div>
+  </div>
+  <span class="px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 shrink-0 flex items-center gap-1.5">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    API Connected (api-bakong.nbc.gov.kh)
+  </span>
+</div>
+
+<!-- KHQR Orders Table -->
+<div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-xs">
+      <thead>
+        <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+          <th class="py-3 px-4">Order #</th>
+          <th class="py-3 px-4">Customer</th>
+          <th class="py-3 px-4">Bakong Transaction MD5</th>
+          <th class="py-3 px-4">Amount</th>
+          <th class="py-3 px-4">Fulfillment</th>
+          <th class="py-3 px-4">Verification</th>
+          <th class="py-3 px-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800/60 text-slate-300">
+        {% if orders %}
+          {% for o in orders %}
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-3.5 px-4">
+              <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="font-bold text-white hover:text-rose-400 font-mono">
+                #{{ o.order_number }}
+              </a>
+              <p class="text-[11px] text-slate-500">{{ o.create_at.strftime('%Y-%m-%d %H:%M') if o.create_at else '-' }}</p>
+            </td>
+
+            <td class="py-3.5 px-4">
+              <p class="font-semibold text-white">{{ o.customer_name }}</p>
+              <p class="text-[11px] text-slate-400 font-mono">{{ o.customer_phone }}</p>
+            </td>
+
+            <td class="py-3.5 px-4">
+              <span class="font-mono text-[11px] text-rose-300 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-700 block max-w-xs truncate" title="{{ o.bakong_md5 or 'No MD5' }}">
+                {{ o.bakong_md5 or 'N/A' }}
+              </span>
+            </td>
+
+            <td class="py-3.5 px-4 font-bold text-white font-mono text-sm">
+              ${{ "%.2f"|format(o.total_amount) }}
+            </td>
+
+            <td class="py-3.5 px-4">
+              {% if o.delivery_type == 'pickup' %}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  Pickup
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  Delivery
+                </span>
+              {% endif %}
+            </td>
+
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                PAID & VERIFIED
+              </span>
+            </td>
+
+            <td class="py-3.5 px-4 text-right">
+              <a href="{{ url_for('admin.admin_order_detail', order_id=o.id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>View</span>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="py-12 text-center text-slate-500">
+              No Bakong KHQR orders recorded yet.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

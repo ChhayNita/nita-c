@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 
 from app import app
 from extensions import db
-from model import User, Category, Product, ProductImage
+from model import User, Category, Product, ProductImage, Order, OrderItem
 from helper import load_users, save_users
 
 
@@ -128,6 +128,72 @@ def seed_database():
 
         db.session.commit()
         save_users(json_users)
+
+        # Seed Sample Orders if empty
+        if Order.query.count() == 0:
+            sample_product = Product.query.first()
+            p_id = sample_product.id if sample_product else 1
+            p_name = sample_product.name if sample_product else "Wireless Headphones"
+            p_price = float(sample_product.Price) if sample_product else 45.00
+
+            # 1. KHQR Paid Order
+            o1 = Order(
+                order_number="ORD-20261022-1001",
+                customer_name="Sokha Chan",
+                customer_phone="012 888 999",
+                customer_email="sokha@gmail.com",
+                delivery_type="delivery",
+                shipping_address="No. 12B, St 271, Sangkat Boeng Tumpun, Khan Meanchey, Phnom Penh",
+                notes="Leave at security desk",
+                payment_method="khqr",
+                payment_status="Paid",
+                order_status="Processing",
+                total_amount=p_price * 2,
+                bakong_md5="0866ba4dc9e6c44ed8e55ed538f191e3",
+                bakong_qr="00020101021229210017chey_kimrith@bkrt5204599953038405802KH5909Ecommerce6010Phnom Penh"
+            )
+            db.session.add(o1)
+            db.session.flush()
+            db.session.add(OrderItem(order_id=o1.id, product_id=p_id, product_name=p_name, product_price=p_price, quantity=2, subtotal=p_price * 2))
+
+            # 2. Store Pickup Order
+            o2 = Order(
+                order_number="ORD-20261022-1002",
+                customer_name="Dara Kim",
+                customer_phone="098 777 666",
+                customer_email="dara@gmail.com",
+                delivery_type="pickup",
+                shipping_address="Store Pickup: SV7 Store Main Branch",
+                notes="Will pick up around 3 PM",
+                payment_method="cash",
+                payment_status="Pending",
+                order_status="Ready for Pickup",
+                total_amount=p_price
+            )
+            db.session.add(o2)
+            db.session.flush()
+            db.session.add(OrderItem(order_id=o2.id, product_id=p_id, product_name=p_name, product_price=p_price, quantity=1, subtotal=p_price))
+
+            # 3. Delivery Order
+            o3 = Order(
+                order_number="ORD-20261022-1003",
+                customer_name="Bopha Vong",
+                customer_phone="077 555 444",
+                customer_email="bopha@gmail.com",
+                delivery_type="delivery",
+                shipping_address="Building 45, Russian Blvd, Toul Kork, Phnom Penh",
+                notes="Call before arrival",
+                payment_method="cash",
+                payment_status="Pending",
+                order_status="Processing",
+                total_amount=p_price
+            )
+            db.session.add(o3)
+            db.session.flush()
+            db.session.add(OrderItem(order_id=o3.id, product_id=p_id, product_name=p_name, product_price=p_price, quantity=1, subtotal=p_price))
+
+            db.session.commit()
+            print("[+] Seeded 3 sample orders (Pickup, KHQR, Delivery)")
 
         print("\n=======================================================")
         print("  Database Seeding Completed Successfully!")

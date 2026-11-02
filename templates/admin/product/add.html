@@ -86,15 +86,13 @@
         </label>
         <span class="text-[11px] text-slate-400">Primary display image</span>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-slate-400 text-[11px] mb-1">Upload File:</label>
-          <input type="file" name="thumbnail" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
+      <div>
+        <div id="thumb-preview-container" class="mb-3">
+          <p class="text-[11px] text-slate-400 mb-1.5">Thumbnail Preview (Default placeholder used if empty):</p>
+          <img id="thumb-preview" src="https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png" alt="Thumbnail Preview" class="w-24 h-24 object-cover rounded-xl border border-slate-600 shadow-md">
         </div>
-        <div>
-          <label class="block text-slate-400 text-[11px] mb-1">Or Direct URL:</label>
-          <input type="url" name="thumbnail_url" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all">
-        </div>
+        <input type="file" name="thumbnail" id="product-thumb-file" accept="image/*" onchange="previewProductThumb(this)" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer border border-slate-700/80 rounded-xl bg-slate-800/40 p-1">
+        <p class="text-[11px] text-slate-500 mt-1.5">Upload PNG, JPG, JPEG, WEBP</p>
       </div>
     </div>
 
@@ -121,13 +119,7 @@
       <!-- Multiple File Input -->
       <div>
         <label class="block text-slate-300 text-[11px] font-medium mb-1">Select multiple files (Hold Ctrl/Shift to choose multiple):</label>
-        <input type="file" name="images" id="multi-images-input" multiple accept="image/*" onchange="previewMultiFiles(event)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gradient-to-r file:from-indigo-600 file:to-blue-600 file:text-white hover:file:from-indigo-500 hover:file:to-blue-500 cursor-pointer">
-      </div>
-
-      <!-- Multiple URLs Input Option -->
-      <div>
-        <label class="block text-slate-400 text-[11px] mb-1">Or add multiple image URLs (comma or newline separated):</label>
-        <textarea name="gallery_urls" rows="2" placeholder="https://images.example.com/item_angle1.jpg&#10;https://images.example.com/item_angle2.jpg" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-mono text-[11px]"></textarea>
+        <input type="file" name="images" id="multi-images-input" multiple accept="image/*" onchange="previewMultiFiles(event)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gradient-to-r file:from-indigo-600 file:to-blue-600 file:text-white hover:file:from-indigo-500 hover:file:to-blue-500 cursor-pointer border border-slate-700/80 rounded-xl bg-slate-800/40 p-1">
       </div>
 
       <!-- Live Preview Container for Multiple Uploaded Files -->
@@ -154,6 +146,21 @@
 </div>
 
 <script>
+  const defaultPlaceholder = "https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png";
+
+  function previewProductThumb(input) {
+    const preview = document.getElementById('thumb-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = defaultPlaceholder;
+    }
+  }
+
   function previewMultiFiles(event) {
     const container = document.getElementById('multi-preview-container');
     const thumbnailsDiv = document.getElementById('preview-thumbnails');

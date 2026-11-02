@@ -1,22 +1,90 @@
 {% extends "front/base.html" %}
 
 {% block content %}
-  <section class="container section">
-    <div class="form-panel">
-      <div class="eyebrow">Account</div>
-      <h2>My account</h2>
-      {% if current_user %}
-        <p><strong>Name:</strong> {{ current_user.name }}</p>
-        <p><strong>Email:</strong> {{ current_user.email }}</p>
-        <form method="post" action="{{ url_for('user.logout') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<section class="container section" style="font-family: 'Plus Jakarta Sans', system-ui, sans-serif; padding: 48px 16px;">
+  <div style="max-width: 640px; margin: 0 auto;">
+    
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);">
+      
+      <!-- Profile Header Banner -->
+      <div style="background: linear-gradient(135deg, #078678 0%, #056b61 100%); padding: 32px 24px; text-align: center; color: white;">
+        <div style="position: relative; width: 104px; height: 104px; margin: 0 auto 14px;">
+          <img id="account-avatar-preview" 
+               src="{{ (user.profile_image if user else None) or current_user.image or 'https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png' }}" 
+               alt="{{ user.name if user else 'Profile' }}" 
+               style="width: 104px; height: 104px; border-radius: 50%; object-fit: cover; border: 4px solid #ffffff; box-shadow: 0 4px 14px rgba(0,0,0,0.2);"
+               onerror="this.src='https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png'">
+        </div>
+        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800;">{{ user.fullname if user and user.fullname else (current_user.name or 'Customer') }}</h2>
+        <p style="margin: 4px 0 0; opacity: 0.85; font-size: 0.85rem;">{{ user.email if user else (current_user.email or '') }}</p>
+        <span style="display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 999px; font-size: 0.725rem; font-weight: 700; margin-top: 8px; letter-spacing: 0.04em;">
+          {{ user.role if user else 'Customer' }}
+        </span>
+      </div>
+
+      <!-- Profile Form -->
+      <div style="padding: 32px 28px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 18px;">Edit Profile Information</h3>
+
+        <form method="post" enctype="multipart/form-data" action="{{ url_for('user.account') }}" style="display: flex; flex-direction: column; gap: 18px;">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit">Logout</button>
+
+          <!-- Change Profile Picture -->
+          <div>
+            <label style="display: block; font-size: 0.825rem; font-weight: 700; color: #334155; margin-bottom: 6px;">Change Profile Picture</label>
+            <input type="file" name="image" accept="image/*" onchange="previewAccountAvatar(this)" style="width: 100%; padding: 10px; border: 1.5px dashed #cbd5e1; border-radius: 10px; font-size: 0.85rem; font-family: inherit; background: #f8fafc; cursor: pointer;">
+            <span style="font-size: 0.725rem; color: #64748b; margin-top: 4px; display: block;">Supports JPG, PNG, WEBP, GIF (Upload file only)</span>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.825rem; font-weight: 700; color: #334155; margin-bottom: 6px;">Full Name</label>
+            <input type="text" name="fullname" value="{{ user.fullname if user else (current_user.fullname or '') }}" required style="width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; box-sizing: border-box;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.825rem; font-weight: 700; color: #334155; margin-bottom: 6px;">Email Address</label>
+            <input type="email" value="{{ user.email if user else (current_user.email or '') }}" disabled style="width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; box-sizing: border-box; background: #f1f5f9; color: #64748b; cursor: not-allowed;">
+            <span style="font-size: 0.725rem; color: #94a3b8; margin-top: 4px; display: block;">Email address cannot be changed</span>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 8px;">
+            <button type="submit" style="flex: 1; background: linear-gradient(135deg, #078678, #056b61); color: #ffffff; border: none; padding: 12px 20px; border-radius: 10px; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(7, 134, 120, 0.25);">
+              Save Changes
+            </button>
+          </div>
         </form>
-      {% else %}
-        <p>Please login or create an account.</p>
-        <a class="button" href="{{ url_for('user.login') }}">Login</a>
-        <a class="button secondary" href="{{ url_for('user.register') }}">Create user</a>
-      {% endif %}
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+          <a href="{{ url_for('user.products') }}" style="color: #64748b; font-size: 0.85rem; font-weight: 600; text-decoration: none;">← Continue Shopping</a>
+          
+          <form method="post" action="{{ url_for('user.logout') }}" style="margin: 0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" style="background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
+              Sign Out
+            </button>
+          </form>
+        </div>
+
+      </div>
+
     </div>
-  </section>
+
+  </div>
+</section>
+
+<script>
+  function previewAccountAvatar(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('account-avatar-preview').src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
 {% endblock %}

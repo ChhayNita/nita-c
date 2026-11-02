@@ -6,6 +6,9 @@ from decorators import admin_required
 from . import admin_bp
 
 
+DEFAULT_CATEGORY_IMAGE = "https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png"
+
+
 @admin_bp.route("/categories")
 @admin_required
 def admin_categories():
@@ -23,7 +26,6 @@ def admin_category_add():
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         description = request.form.get("description", "").strip()
-        image_url = request.form.get("image_url", "").strip()
 
         if not name:
             flash("Category name is required.", "danger")
@@ -42,9 +44,9 @@ def admin_category_add():
             if file and file.filename:
                 image_path = upload_image(file)
 
-        # Fallback to URL if provided and no file uploaded
-        if not image_path and image_url:
-            image_path = image_url
+        # Use default placeholder if no image was uploaded
+        if not image_path:
+            image_path = DEFAULT_CATEGORY_IMAGE
 
         category = Category(
             name=name,
@@ -68,7 +70,6 @@ def admin_category_edit(category_id):
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         description = request.form.get("description", "").strip()
-        image_url = request.form.get("image_url", "").strip()
 
         if not name:
             flash("Category name is required.", "danger")
@@ -87,9 +88,6 @@ def admin_category_edit(category_id):
                 new_image = upload_image(file)
                 if new_image:
                     category.image = new_image
-
-        if image_url:
-            category.image = image_url
 
         category.name = name
         category.description = description

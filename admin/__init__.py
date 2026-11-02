@@ -8,3 +8,4 @@ from . import dashboard
 from . import products
 from . import users
 from . import categories
+from . import orders

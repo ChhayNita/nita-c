@@ -1,0 +1,72 @@
+{% extends "front/base.html" %}
+
+{% block content %}
+  <section class="container product-detail">
+    <!-- Multi-Image Gallery -->
+    <div class="product-gallery">
+      <!-- Main Featured Image -->
+      <div class="product-main-image">
+        <img id="main-product-img" src="{{ product.image }}" alt="{{ product.title }}">
+      </div>
+
+      <!-- Thumbnails Strip (all images from product and product_image table) -->
+      {% if product.images and product.images|length > 1 %}
+        <div class="product-thumbs-strip">
+          {% for img_src in product.images %}
+            <div class="thumb-item {% if loop.first %}active{% endif %}" onclick="selectThumb(this, '{{ img_src }}')" title="View photo {{ loop.index }}">
+              <img src="{{ img_src }}" alt="{{ product.title }} photo {{ loop.index }}">
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Product Info Details -->
+    <div>
+      <div class="eyebrow">{{ product.category }}</div>
+      <h1>{{ product.title }}</h1>
+      <div class="rating">{{ product.rating.rate }} / 5</div>
+      <p>{{ product.description }}</p>
+      <div class="price-row large">
+        {% if product.has_discount %}
+          <span class="old-price">${{ "%.2f"|format(product.original_price) }}</span>
+        {% endif %}
+        <span class="price">${{ "%.2f"|format(product.discounted_price) }}</span>
+      </div>
+      <div class="actions">
+        <form method="post" action="{{ url_for('user.add_to_cart', product_id=product.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit">Add to cart</button>
+        </form>
+        <a class="button secondary" href="{{ url_for('user.checkout') }}">Buy now</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function selectThumb(el, src) {
+      const mainImg = document.getElementById('main-product-img');
+      if (mainImg) {
+        mainImg.style.opacity = '0.3';
+        setTimeout(() => {
+          mainImg.src = src;
+          mainImg.style.opacity = '1';
+        }, 120);
+      }
+      document.querySelectorAll('.thumb-item').forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+    }
+  </script>
+
+  <section class="container section">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Related products</div>
+        <h2>Similar category</h2>
+      </div>
+      <a href="{{ url_for('user.products') }}">All products</a>
+    </div>
+    {% set products = related %}
+    {% include "front/share/product-grid.html" %}
+  </section>
+{% endblock %}

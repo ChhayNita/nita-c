@@ -1,0 +1,1115 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en" class="h-full bg-slate-900 text-slate-100">#}
+{#<head>#}
+{#  <meta charset="UTF-8">#}
+{#  <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#  <title>Admin Dashboard | SV7 Store</title>#}
+{#  <!-- Tailwind CSS CDN -->#}
+{#  <script src="https://cdn.tailwindcss.com"></script>#}
+{#  <script>#}
+{#    tailwind.config = {#}
+{#      darkMode: 'class',#}
+{#      theme: {#}
+{#        extend: {#}
+{#          fontFamily: {#}
+{#            sans: ['Inter', 'sans-serif'],#}
+{#          },#}
+{#          colors: {#}
+{#            brand: {#}
+{#              50: '#f0f6ff',#}
+{#              100: '#e0edff',#}
+{#              500: '#3b82f6',#}
+{#              600: '#2563eb',#}
+{#              700: '#1d4ed8',#}
+{#              900: '#1e3a8a',#}
+{#            }#}
+{#          }#}
+{#        }#}
+{#      }#}
+{#    }#}
+{#  </script>#}
+{#  <!-- Google Fonts Inter -->#}
+{#  <link rel="preconnect" href="https://fonts.googleapis.com">#}
+{#  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>#}
+{#  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">#}
+{#  <!-- Chart.js CDN -->#}
+{#  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>#}
+{#  <style>#}
+{#    body { font-family: 'Inter', sans-serif; }#}
+{#    /* Custom Scrollbars */#}
+{#    ::-webkit-scrollbar { width: 6px; height: 6px; }#}
+{#    ::-webkit-scrollbar-track { background: #0f172a; }#}
+{#    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }#}
+{#    ::-webkit-scrollbar-thumb:hover { background: #475569; }#}
+{#    .glass-panel {#}
+{#      background: rgba(30, 41, 59, 0.7);#}
+{#      backdrop-filter: blur(12px);#}
+{#      border: 1px solid rgba(255, 255, 255, 0.08);#}
+{#    }#}
+{#    .active-nav-link {#}
+{#      background: linear-gradient(90deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%);#}
+{#      border-left: 3px solid #3b82f6;#}
+{#      color: #60a5fa;#}
+{#    }#}
+{#  </style>#}
+{#</head>#}
+{#<body class="h-full antialiased overflow-x-hidden selection:bg-blue-500 selection:text-white">#}
+{##}
+{#  <!-- Toast Notification System -->#}
+{#  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>#}
+{##}
+{#  <div class="min-h-full flex flex-col md:flex-row">#}
+{##}
+{#    <!-- Mobile Header -->#}
+{#    <header class="md:hidden flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">#}
+{#      <div class="flex items-center gap-3">#}
+{#        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30">#}
+{#          S#}
+{#        </div>#}
+{#        <span class="font-bold text-lg tracking-wide text-white">SV7 Admin</span>#}
+{#      </div>#}
+{#      <button id="mobile-menu-btn" onclick="toggleSidebar()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700">#}
+{#        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>#}
+{#      </button>#}
+{#    </header>#}
+{##}
+{#    <!-- Sidebar Navigation -->#}
+{#    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900/95 border-r border-slate-800 transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:static md:flex md:flex-col justify-between shrink-0 glass-panel">#}
+{#      <div>#}
+{#        <!-- Brand Logo -->#}
+{#        <div class="h-16 flex items-center justify-between px-6 border-b border-slate-800">#}
+{#          <div class="flex items-center gap-3">#}
+{#            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/25">#}
+{#              S#}
+{#            </div>#}
+{#            <div>#}
+{#              <h1 class="font-bold text-base tracking-wide text-white leading-tight">SV7 Store</h1>#}
+{#              <p class="text-xs text-slate-400 font-medium">Control Center</p>#}
+{#            </div>#}
+{#          </div>#}
+{#          <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">#}
+{#            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>#}
+{#          </button>#}
+{#        </div>#}
+{##}
+{#        <!-- Main Navigation Links -->#}
+{#        <nav class="p-4 space-y-1.5">#}
+{#          <div class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Main Menu</div>#}
+{##}
+{#          <!-- Dashboard Tab Link -->#}
+{#          <a href="#dashboard" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all active-nav-link">#}
+{#            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>#}
+{#            <span>Overview Dashboard</span>#}
+{#          </a>#}
+{##}
+{#          <!-- Products Tab Link -->#}
+{#          <a href="#products" onclick="switchTab('products')" id="nav-products" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">#}
+{#            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>#}
+{#            <span>Product Catalog</span>#}
+{#            <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-semibold" id="sidebar-product-count">8</span>#}
+{#          </a>#}
+{##}
+{#          <!-- Users Tab Link -->#}
+{#          <a href="#users" onclick="switchTab('users')" id="nav-users" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">#}
+{#            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>#}
+{#            <span>User Management</span>#}
+{#            <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold" id="sidebar-user-count">6</span>#}
+{#          </a>#}
+{##}
+{#          <div class="px-3 pt-6 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Actions</div>#}
+{#          <a href="/" target="_blank" class="flex items-center gap-3 px-3.5 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800/40">#}
+{#            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>#}
+{#            <span>View Live Store</span>#}
+{#          </a>#}
+{#        </nav>#}
+{#      </div>#}
+{##}
+{#      <!-- Footer User Profile Badge -->#}
+{#      <div class="p-4 border-t border-slate-800">#}
+{#        <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-800/60">#}
+{#          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-violet-500 to-indigo-500 flex items-center justify-center font-bold text-white shadow">#}
+{#            CR#}
+{#          </div>#}
+{#          <div class="overflow-hidden">#}
+{#            <h4 class="text-sm font-semibold text-white truncate">CHANRITH ROUNG</h4>#}
+{#            <p class="text-xs text-slate-400 truncate">Super Admin</p>#}
+{#          </div>#}
+{#        </div>#}
+{#      </div>#}
+{#    </aside>#}
+{##}
+{#    <!-- Main Content Area -->#}
+{#    <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">#}
+{##}
+{#      <!-- Top Header Navigation -->#}
+{#      <header class="h-16 px-6 glass-panel border-b border-slate-800 flex items-center justify-between sticky top-0 z-30">#}
+{#        <!-- Title & Breadcrumb -->#}
+{#        <div class="flex items-center gap-4">#}
+{#          <h2 id="page-title" class="text-xl font-bold text-white tracking-tight">Overview Dashboard</h2>#}
+{#          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium flex items-center gap-1.5">#}
+{#            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Systems Operational#}
+{#          </span>#}
+{#        </div>#}
+{##}
+{#        <!-- Right Header Options -->#}
+{#        <div class="flex items-center gap-4">#}
+{#          <!-- Quick Search -->#}
+{#          <div class="relative hidden sm:block">#}
+{#            <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search anything..." class="w-64 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-1.5 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pl-9 transition-all">#}
+{#            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>#}
+{#          </div>#}
+{##}
+{#          <!-- Notification Button -->#}
+{#          <button onclick="showToast('Notification center: 3 new orders today', 'info')" class="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition relative">#}
+{#            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>#}
+{#            <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-blue-500 rounded-full border-2 border-slate-800"></span>#}
+{#          </button>#}
+{##}
+{#          <!-- Store Front Link Button -->#}
+{#          <a href="/" class="hidden lg:flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition">#}
+{#            <span>Store Front</span>#}
+{#            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>#}
+{#          </a>#}
+{#        </div>#}
+{#      </header>#}
+{##}
+{#      <!-- Main Body Views -->#}
+{#      <main class="p-6 space-y-6 flex-1">#}
+{##}
+{#        <!-- ================= SECTION 1: DASHBOARD OVERVIEW ================= -->#}
+{#        <section id="view-dashboard" class="space-y-6">#}
+{##}
+{#          <!-- Dynamic KPI Cards Row -->#}
+{#          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">#}
+{#            <!-- Card 1: Total Revenue -->#}
+{#            <div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all">#}
+{#              <div class="flex justify-between items-start">#}
+{#                <div>#}
+{#                  <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Revenue</p>#}
+{#                  <h3 class="text-2xl font-bold text-white mt-1">$48,290.50</h3>#}
+{#                </div>#}
+{#                <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">#}
+{#                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>#}
+{#                </div>#}
+{#              </div>#}
+{#              <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-400">#}
+{#                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>#}
+{#                <span>+14.2%</span>#}
+{#                <span class="text-slate-500 font-normal">vs last month</span>#}
+{#              </div>#}
+{#            </div>#}
+{##}
+{#            <!-- Card 2: Total Orders -->#}
+{#            <div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl relative overflow-hidden group hover:border-violet-500/30 transition-all">#}
+{#              <div class="flex justify-between items-start">#}
+{#                <div>#}
+{#                  <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Orders</p>#}
+{#                  <h3 class="text-2xl font-bold text-white mt-1">1,248</h3>#}
+{#                </div>#}
+{#                <div class="p-3 rounded-xl bg-violet-500/10 text-violet-400 group-hover:scale-110 transition-transform">#}
+{#                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>#}
+{#                </div>#}
+{#              </div>#}
+{#              <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-400">#}
+{#                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>#}
+{#                <span>+8.1%</span>#}
+{#                <span class="text-slate-500 font-normal">vs last month</span>#}
+{#              </div>#}
+{#            </div>#}
+{##}
+{#            <!-- Card 3: Total Products -->#}
+{#            <div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl relative overflow-hidden group hover:border-amber-500/30 transition-all">#}
+{#              <div class="flex justify-between items-start">#}
+{#                <div>#}
+{#                  <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Catalog</p>#}
+{#                  <h3 class="text-2xl font-bold text-white mt-1" id="dash-product-count">8</h3>#}
+{#                </div>#}
+{#                <div class="p-3 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">#}
+{#                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>#}
+{#                </div>#}
+{#              </div>#}
+{#              <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-amber-400">#}
+{#                <span>4 Categories</span>#}
+{#                <span class="text-slate-500 font-normal">• Inventory Ready</span>#}
+{#              </div>#}
+{#            </div>#}
+{##}
+{#            <!-- Card 4: Registered Users -->#}
+{#            <div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl relative overflow-hidden group hover:border-emerald-500/30 transition-all">#}
+{#              <div class="flex justify-between items-start">#}
+{#                <div>#}
+{#                  <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Registered Users</p>#}
+{#                  <h3 class="text-2xl font-bold text-white mt-1" id="dash-user-count">6</h3>#}
+{#                </div>#}
+{#                <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">#}
+{#                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>#}
+{#                </div>#}
+{#              </div>#}
+{#              <div class="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-400">#}
+{#                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>#}
+{#                <span>Active Accounts</span>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <!-- Charts Row -->#}
+{#          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">#}
+{#            <!-- Revenue Analytics (Line Chart) -->#}
+{#            <div class="lg:col-span-2 p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col justify-between">#}
+{#              <div class="flex items-center justify-between mb-4">#}
+{#                <div>#}
+{#                  <h3 class="text-base font-bold text-white">Revenue & Orders Performance</h3>#}
+{#                  <p class="text-xs text-slate-400">Monthly revenue trends and transaction volume</p>#}
+{#                </div>#}
+{#                <select class="bg-slate-800 text-xs text-slate-300 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none">#}
+{#                  <option>Last 6 Months</option>#}
+{#                  <option>Last 30 Days</option>#}
+{#                  <option>Year 2026</option>#}
+{#                </select>#}
+{#              </div>#}
+{#              <div class="relative h-64 w-full">#}
+{#                <canvas id="revenueChart"></canvas>#}
+{#              </div>#}
+{#            </div>#}
+{##}
+{#            <!-- Category Sales Breakdown (Doughnut Chart) -->#}
+{#            <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col justify-between">#}
+{#              <div class="mb-4">#}
+{#                <h3 class="text-base font-bold text-white">Sales by Category</h3>#}
+{#                <p class="text-xs text-slate-400">Distribution across product categories</p>#}
+{#              </div>#}
+{#              <div class="relative h-56 w-full flex items-center justify-center">#}
+{#                <canvas id="categoryChart"></canvas>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <!-- Recent Orders Table -->#}
+{#          <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl">#}
+{#            <div class="flex items-center justify-between mb-5">#}
+{#              <div>#}
+{#                <h3 class="text-base font-bold text-white">Recent Store Orders</h3>#}
+{#                <p class="text-xs text-slate-400">Latest customer purchases and order status</p>#}
+{#              </div>#}
+{#              <button onclick="showToast('Viewing full order feed...', 'info')" class="text-xs font-semibold text-blue-400 hover:text-blue-300">View All Orders →</button>#}
+{#            </div>#}
+{##}
+{#            <div class="overflow-x-auto">#}
+{#              <table class="w-full text-left border-collapse text-xs">#}
+{#                <thead>#}
+{#                  <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">#}
+{#                    <th class="py-3 px-4">Order ID</th>#}
+{#                    <th class="py-3 px-4">Customer</th>#}
+{#                    <th class="py-3 px-4">Date</th>#}
+{#                    <th class="py-3 px-4">Amount</th>#}
+{#                    <th class="py-3 px-4">Status</th>#}
+{#                    <th class="py-3 px-4 text-right">Action</th>#}
+{#                  </tr>#}
+{#                </thead>#}
+{#                <tbody class="divide-y divide-slate-800/60 text-slate-300">#}
+{#                  <tr class="hover:bg-slate-800/40 transition">#}
+{#                    <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9482</td>#}
+{#                    <td class="py-3.5 px-4 font-medium text-white">Alex Morgan</td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Jul 22, 2026</td>#}
+{#                    <td class="py-3.5 px-4 font-semibold text-white">$109.95</td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Completed</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9482', 'info')" class="text-slate-400 hover:text-white">Details</button></td>#}
+{#                  </tr>#}
+{#                  <tr class="hover:bg-slate-800/40 transition">#}
+{#                    <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9481</td>#}
+{#                    <td class="py-3.5 px-4 font-medium text-white">Sophia Chen</td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Jul 22, 2026</td>#}
+{#                    <td class="py-3.5 px-4 font-semibold text-white">$22.30</td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Processing</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9481', 'info')" class="text-slate-400 hover:text-white">Details</button></td>#}
+{#                  </tr>#}
+{#                  <tr class="hover:bg-slate-800/40 transition">#}
+{#                    <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9480</td>#}
+{#                    <td class="py-3.5 px-4 font-medium text-white">Michael Scott</td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Jul 21, 2026</td>#}
+{#                    <td class="py-3.5 px-4 font-semibold text-white">$55.99</td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Pending</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9480', 'info')" class="text-slate-400 hover:text-white">Details</button></td>#}
+{#                  </tr>#}
+{#                  <tr class="hover:bg-slate-800/40 transition">#}
+{#                    <td class="py-3.5 px-4 font-mono text-blue-400 font-semibold">#ORD-9479</td>#}
+{#                    <td class="py-3.5 px-4 font-medium text-white">Emma Watson</td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Jul 20, 2026</td>#}
+{#                    <td class="py-3.5 px-4 font-semibold text-white">$699.00</td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Completed</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right"><button onclick="showToast('Viewing order #ORD-9479', 'info')" class="text-slate-400 hover:text-white">Details</button></td>#}
+{#                  </tr>#}
+{#                </tbody>#}
+{#              </table>#}
+{#            </div>#}
+{#          </div>#}
+{#        </section>#}
+{##}
+{#        <!-- ================= SECTION 2: PRODUCT MANAGEMENT ================= -->#}
+{#        <section id="view-products" class="space-y-6 hidden">#}
+{#          <!-- Top Control Header & Search Filters -->#}
+{#          <div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">#}
+{#            <div class="flex items-center gap-3 w-full md:w-auto">#}
+{#              <!-- Search Bar -->#}
+{#              <div class="relative flex-1 md:w-80">#}
+{#                <input type="text" id="product-search" oninput="filterProducts()" placeholder="Filter products by title..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 pl-9">#}
+{#                <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>#}
+{#              </div>#}
+{##}
+{#              <!-- Category Select -->#}
+{#              <select id="product-category-filter" onchange="filterProducts()" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none">#}
+{#                <option value="">All Categories</option>#}
+{#                <option value="electronics">Electronics</option>#}
+{#                <option value="jewelery">Jewelery</option>#}
+{#                <option value="men's clothing">Men's Clothing</option>#}
+{#                <option value="women's clothing">Women's Clothing</option>#}
+{#              </select>#}
+{#            </div>#}
+{##}
+{#            <!-- Action Buttons -->#}
+{#            <div class="flex items-center gap-3 w-full md:w-auto justify-end">#}
+{#              <button onclick="openModal('modal-add-product')" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-indigo-500 transition">#}
+{#                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>#}
+{#                <span>Add Product</span>#}
+{#              </button>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <!-- Product Table Card -->#}
+{#          <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl">#}
+{#            <div class="overflow-x-auto">#}
+{#              <table class="w-full text-left border-collapse text-xs" id="product-table">#}
+{#                <thead>#}
+{#                  <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">#}
+{#                    <th class="py-3 px-4">Item</th>#}
+{#                    <th class="py-3 px-4">Category</th>#}
+{#                    <th class="py-3 px-4">Price</th>#}
+{#                    <th class="py-3 px-4">Stock</th>#}
+{#                    <th class="py-3 px-4">Rating</th>#}
+{#                    <th class="py-3 px-4 text-right">Actions</th>#}
+{#                  </tr>#}
+{#                </thead>#}
+{#                <tbody class="divide-y divide-slate-800/60 text-slate-300" id="product-table-body">#}
+{#                  <!-- Row 1 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="fjallraven foldsack backpack" data-category="men's clothing">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg" alt="Backpack" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">Fjallraven - Foldsack No. 1 Backpack</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #101</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">men's clothing</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$109.95</span> <span class="text-[11px] text-slate-500 line-through ml-1">$126.44</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 3.9 <span class="text-slate-500 font-normal">(120)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing Backpack #101', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- Row 2 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="mens casual premium slim fit t-shirts" data-category="men's clothing">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg" alt="T-Shirt" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">Mens Casual Premium Slim Fit T-Shirts</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #102</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">men's clothing</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$22.30</span> <span class="text-[11px] text-slate-500 line-through ml-1">$25.65</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 4.1 <span class="text-slate-500 font-normal">(259)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing T-Shirts #102', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- Row 3 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="john hardy dragon station chain bracelet" data-category="jewelery">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_.jpg" alt="Bracelet" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">John Hardy Dragon Chain Bracelet</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #103</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">jewelery</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$695.00</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Low Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 4.6 <span class="text-slate-500 font-normal">(400)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing Bracelet #103', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- Row 4 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="wd 2tb elements external hard drive" data-category="electronics">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg" alt="Hard Drive" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">WD 2TB Elements Portable Hard Drive</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #104</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">electronics</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$64.00</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 4.7 <span class="text-slate-500 font-normal">(670)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing Hard Drive #104', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- Row 5 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="sanDisk ssd 1tb internal solid state drive" data-category="electronics">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg" alt="SSD" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">SanDisk SSD PLUS 1TB Internal Drive</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #105</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">electronics</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$109.00</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 4.8 <span class="text-slate-500 font-normal">(470)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing SSD #105', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- Row 6 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="samsung 49-inch gaming monitor" data-category="electronics">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/81Zt42ioCgL._AC_SX679_.jpg" alt="Monitor" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">Samsung 49-Inch Curved Gaming Monitor</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #106</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">electronics</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$999.99</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 4.9 <span class="text-slate-500 font-normal">(320)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing Monitor #106', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- Row 7 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="lock and love womens removable hooded faux leather jacket" data-category="women's clothing">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/81XH0e8fefL._AC_UY879_.jpg" alt="Jacket" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">Women's Removable Hooded Faux Jacket</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #107</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">women's clothing</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$29.95</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 4.3 <span class="text-slate-500 font-normal">(190)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing Jacket #107', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- Row 8 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition product-row" data-title="rain jacket women windbreaker" data-category="women's clothing">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <img src="https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2.jpg" alt="Windbreaker" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#                      <div class="max-w-xs">#}
+{#                        <p class="font-medium text-white truncate text-xs">Rain Jacket Women Waterproof Windbreaker</p>#}
+{#                        <p class="text-[11px] text-slate-500 font-mono">ID: #108</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">women's clothing</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="font-semibold text-white">$39.99</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span></td>#}
+{#                    <td class="py-3.5 px-4 text-amber-400 font-medium">★ 4.4 <span class="text-slate-500 font-normal">(210)</span></td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing Windbreaker #108', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteProductRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{#                </tbody>#}
+{#              </table>#}
+{#            </div>#}
+{#          </div>#}
+{#        </section>#}
+{##}
+{#        <!-- ================= SECTION 3: USER MANAGEMENT ================= -->#}
+{#        <section id="view-users" class="space-y-6 hidden">#}
+{#          <!-- User Metrics Summary Cards -->#}
+{#          <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">#}
+{#            <div class="p-4 rounded-2xl glass-panel border border-slate-800 flex items-center gap-4">#}
+{#              <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400">#}
+{#                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>#}
+{#              </div>#}
+{#              <div>#}
+{#                <p class="text-xs text-slate-400">Total System Users</p>#}
+{#                <h4 class="text-xl font-bold text-white" id="user-total-badge">6 Registered</h4>#}
+{#              </div>#}
+{#            </div>#}
+{#            <div class="p-4 rounded-2xl glass-panel border border-slate-800 flex items-center gap-4">#}
+{#              <div class="p-3 rounded-xl bg-violet-500/10 text-violet-400">#}
+{#                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>#}
+{#              </div>#}
+{#              <div>#}
+{#                <p class="text-xs text-slate-400">Admin Personnel</p>#}
+{#                <h4 class="text-xl font-bold text-white">2 Administrators</h4>#}
+{#              </div>#}
+{#            </div>#}
+{#            <div class="p-4 rounded-2xl glass-panel border border-slate-800 flex items-center gap-4">#}
+{#              <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400">#}
+{#                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>#}
+{#              </div>#}
+{#              <div>#}
+{#                <p class="text-xs text-slate-400">Active Account Rate</p>#}
+{#                <h4 class="text-xl font-bold text-white">100% Active</h4>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{##}
+{#          <!-- Controls Header -->#}
+{#          <div class="p-5 rounded-2xl glass-panel border border-slate-800 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">#}
+{#            <div class="flex items-center gap-3 w-full md:w-auto">#}
+{#              <div class="relative flex-1 md:w-80">#}
+{#                <input type="text" id="user-search" oninput="filterUsers()" placeholder="Search users by name or email..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 pl-9">#}
+{#                <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>#}
+{#              </div>#}
+{#              <select id="user-role-filter" onchange="filterUsers()" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none">#}
+{#                <option value="">All Roles</option>#}
+{#                <option value="admin">Admin</option>#}
+{#                <option value="customer">Customer</option>#}
+{#              </select>#}
+{#            </div>#}
+{##}
+{#            <button onclick="openModal('modal-add-user')" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-xs shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-teal-500 transition">#}
+{#              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>#}
+{#              <span>Add New User</span>#}
+{#            </button>#}
+{#          </div>#}
+{##}
+{#          <!-- User Data Table -->#}
+{#          <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl">#}
+{#            <div class="overflow-x-auto">#}
+{#              <table class="w-full text-left border-collapse text-xs" id="user-table">#}
+{#                <thead>#}
+{#                  <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">#}
+{#                    <th class="py-3 px-4">User</th>#}
+{#                    <th class="py-3 px-4">Role</th>#}
+{#                    <th class="py-3 px-4">Status</th>#}
+{#                    <th class="py-3 px-4">Joined Date</th>#}
+{#                    <th class="py-3 px-4 text-right">Actions</th>#}
+{#                  </tr>#}
+{#                </thead>#}
+{#                <tbody class="divide-y divide-slate-800/60 text-slate-300" id="user-table-body">#}
+{#                  <!-- User 1 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition user-row" data-name="chanrith roung" data-email="admin@techey.tech" data-role="admin">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">CR</div>#}
+{#                      <div>#}
+{#                        <p class="font-semibold text-white">CHANRITH ROUNG</p>#}
+{#                        <p class="text-[11px] text-slate-400">admin@techey.tech</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20">Admin</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span></td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Jan 15, 2026</td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing permissions for CHANRITH ROUNG', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteUserRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- User 2 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition user-row" data-name="alex morgan" data-email="alex.m@example.com" data-role="customer">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-teal-500 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">AM</div>#}
+{#                      <div>#}
+{#                        <p class="font-semibold text-white">Alex Morgan</p>#}
+{#                        <p class="text-[11px] text-slate-400">alex.m@example.com</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Customer</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span></td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Feb 02, 2026</td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing permissions for Alex Morgan', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteUserRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- User 3 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition user-row" data-name="sophia chen" data-email="sophia.chen@dev.io" data-role="customer">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">SC</div>#}
+{#                      <div>#}
+{#                        <p class="font-semibold text-white">Sophia Chen</p>#}
+{#                        <p class="text-[11px] text-slate-400">sophia.chen@dev.io</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Customer</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span></td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Mar 10, 2026</td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing permissions for Sophia Chen', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteUserRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- User 4 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition user-row" data-name="michael scott" data-email="michael@dundermifflin.com" data-role="customer">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">MS</div>#}
+{#                      <div>#}
+{#                        <p class="font-semibold text-white">Michael Scott</p>#}
+{#                        <p class="text-[11px] text-slate-400">michael@dundermifflin.com</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Customer</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span></td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Apr 18, 2026</td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing permissions for Michael Scott', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteUserRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- User 5 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition user-row" data-name="emma watson" data-email="emma.watson@cinema.com" data-role="admin">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">EW</div>#}
+{#                      <div>#}
+{#                        <p class="font-semibold text-white">Emma Watson</p>#}
+{#                        <p class="text-[11px] text-slate-400">emma.watson@cinema.com</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20">Admin</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span></td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">May 25, 2026</td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing permissions for Emma Watson', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteUserRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{##}
+{#                  <!-- User 6 -->#}
+{#                  <tr class="hover:bg-slate-800/40 transition user-row" data-name="david kim" data-email="david.kim@tech.net" data-role="customer">#}
+{#                    <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#                      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">DK</div>#}
+{#                      <div>#}
+{#                        <p class="font-semibold text-white">David Kim</p>#}
+{#                        <p class="text-[11px] text-slate-400">david.kim@tech.net</p>#}
+{#                      </div>#}
+{#                    </td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Customer</span></td>#}
+{#                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span></td>#}
+{#                    <td class="py-3.5 px-4 text-slate-400">Jun 14, 2026</td>#}
+{#                    <td class="py-3.5 px-4 text-right space-x-2">#}
+{#                      <button onclick="showToast('Editing permissions for David Kim', 'info')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>#}
+{#                      <button onclick="deleteUserRow(this)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>#}
+{#                    </td>#}
+{#                  </tr>#}
+{#                </tbody>#}
+{#              </table>#}
+{#            </div>#}
+{#          </div>#}
+{#        </section>#}
+{##}
+{#      </main>#}
+{#    </div>#}
+{#  </div>#}
+{##}
+{#  <!-- ================= MODALS ================= -->#}
+{##}
+{#  <!-- Modal: Add New Product -->#}
+{#  <div id="modal-add-product" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">#}
+{#    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl p-6 relative space-y-4">#}
+{#      <div class="flex justify-between items-center border-b border-slate-800 pb-3">#}
+{#        <h3 class="text-base font-bold text-white">Add New Product</h3>#}
+{#        <button onclick="closeModal('modal-add-product')" class="text-slate-400 hover:text-white">✕</button>#}
+{#      </div>#}
+{##}
+{#      <form id="form-add-product" onsubmit="handleAddProductSubmit(event)" class="space-y-3 text-xs">#}
+{#        <div>#}
+{#          <label class="block text-slate-300 font-medium mb-1">Product Title</label>#}
+{#          <input type="text" id="new-prod-title" required placeholder="e.g. Wireless Gaming Headset" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500">#}
+{#        </div>#}
+{#        <div class="grid grid-cols-2 gap-3">#}
+{#          <div>#}
+{#            <label class="block text-slate-300 font-medium mb-1">Price ($)</label>#}
+{#            <input type="number" step="0.01" id="new-prod-price" required placeholder="99.99" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500">#}
+{#          </div>#}
+{#          <div>#}
+{#            <label class="block text-slate-300 font-medium mb-1">Category</label>#}
+{#            <select id="new-prod-category" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none">#}
+{#              <option value="electronics">Electronics</option>#}
+{#              <option value="jewelery">Jewelery</option>#}
+{#              <option value="men's clothing">Men's Clothing</option>#}
+{#              <option value="women's clothing">Women's Clothing</option>#}
+{#            </select>#}
+{#          </div>#}
+{#        </div>#}
+{#        <div>#}
+{#          <label class="block text-slate-300 font-medium mb-1">Image URL</label>#}
+{#          <input type="url" id="new-prod-image" placeholder="https://..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none">#}
+{#        </div>#}
+{#        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">#}
+{#          <button type="button" onclick="closeModal('modal-add-product')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Cancel</button>#}
+{#          <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500">Save Product</button>#}
+{#        </div>#}
+{#      </form>#}
+{#    </div>#}
+{#  </div>#}
+{##}
+{#  <!-- Modal: Add New User -->#}
+{#  <div id="modal-add-user" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">#}
+{#    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl p-6 relative space-y-4">#}
+{#      <div class="flex justify-between items-center border-b border-slate-800 pb-3">#}
+{#        <h3 class="text-base font-bold text-white">Add New System User</h3>#}
+{#        <button onclick="closeModal('modal-add-user')" class="text-slate-400 hover:text-white">✕</button>#}
+{#      </div>#}
+{##}
+{#      <form id="form-add-user" onsubmit="handleAddUserSubmit(event)" class="space-y-3 text-xs">#}
+{#        <div>#}
+{#          <label class="block text-slate-300 font-medium mb-1">Full Name</label>#}
+{#          <input type="text" id="new-user-name" required placeholder="John Doe" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">#}
+{#        </div>#}
+{#        <div>#}
+{#          <label class="block text-slate-300 font-medium mb-1">Email Address</label>#}
+{#          <input type="email" id="new-user-email" required placeholder="user@domain.com" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">#}
+{#        </div>#}
+{#        <div class="grid grid-cols-2 gap-3">#}
+{#          <div>#}
+{#            <label class="block text-slate-300 font-medium mb-1">Role</label>#}
+{#            <select id="new-user-role" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none">#}
+{#              <option value="Customer">Customer</option>#}
+{#              <option value="Admin">Admin</option>#}
+{#            </select>#}
+{#          </div>#}
+{#          <div>#}
+{#            <label class="block text-slate-300 font-medium mb-1">Status</label>#}
+{#            <select id="new-user-status" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none">#}
+{#              <option value="Active">Active</option>#}
+{#              <option value="Inactive">Inactive</option>#}
+{#            </select>#}
+{#          </div>#}
+{#        </div>#}
+{#        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">#}
+{#          <button type="button" onclick="closeModal('modal-add-user')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Cancel</button>#}
+{#          <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-500">Create User</button>#}
+{#        </div>#}
+{#      </form>#}
+{#    </div>#}
+{#  </div>#}
+{##}
+{#  <!-- JavaScript Application Controller -->#}
+{#  <script>#}
+{#    // Tab Navigation Logic#}
+{#    function switchTab(tabId) {#}
+{#      const views = ['dashboard', 'products', 'users'];#}
+{#      views.forEach(v => {#}
+{#        const el = document.getElementById(`view-${v}`);#}
+{#        const nav = document.getElementById(`nav-${v}`);#}
+{#        if (v === tabId) {#}
+{#          el.classList.remove('hidden');#}
+{#          nav.classList.add('active-nav-link');#}
+{#          nav.classList.remove('text-slate-400');#}
+{#        } else {#}
+{#          el.classList.add('hidden');#}
+{#          nav.classList.remove('active-nav-link');#}
+{#          nav.classList.add('text-slate-400');#}
+{#        }#}
+{#      });#}
+{##}
+{#      // Set page title#}
+{#      const titles = {#}
+{#        'dashboard': 'Overview Dashboard',#}
+{#        'products': 'Product Catalog Management',#}
+{#        'users': 'User Account Management'#}
+{#      };#}
+{#      document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';#}
+{#      window.location.hash = tabId;#}
+{#    }#}
+{##}
+{#    // Toggle Mobile Sidebar#}
+{#    function toggleSidebar() {#}
+{#      const sidebar = document.getElementById('sidebar');#}
+{#      sidebar.classList.toggle('-translate-x-full');#}
+{#    }#}
+{##}
+{#    // Toast Notification System#}
+{#    function showToast(message, type = 'success') {#}
+{#      const container = document.getElementById('toast-container');#}
+{#      const toast = document.createElement('div');#}
+{#      const bgColors = {#}
+{#        'success': 'bg-emerald-600 text-white',#}
+{#        'info': 'bg-blue-600 text-white',#}
+{#        'warning': 'bg-amber-600 text-white',#}
+{#        'error': 'bg-rose-600 text-white'#}
+{#      };#}
+{##}
+{#      toast.className = `p-3 rounded-xl shadow-xl text-xs font-semibold flex items-center justify-between gap-3 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto ${bgColors[type] || bgColors.success}`;#}
+{#      toast.innerHTML = `#}
+{#        <span>${message}</span>#}
+{#        <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white">✕</button>#}
+{#      `;#}
+{##}
+{#      container.appendChild(toast);#}
+{#      setTimeout(() => {#}
+{#        toast.classList.remove('translate-y-2', 'opacity-0');#}
+{#      }, 50);#}
+{##}
+{#      setTimeout(() => {#}
+{#        toast.classList.add('opacity-0', '-translate-y-2');#}
+{#        setTimeout(() => toast.remove(), 300);#}
+{#      }, 3500);#}
+{#    }#}
+{##}
+{#    // Modal Control Helpers#}
+{#    function openModal(id) {#}
+{#      document.getElementById(id).classList.remove('hidden');#}
+{#    }#}
+{#    function closeModal(id) {#}
+{#      document.getElementById(id).classList.add('hidden');#}
+{#    }#}
+{##}
+{#    // Live Product Search & Filter#}
+{#    function filterProducts() {#}
+{#      const query = document.getElementById('product-search').value.toLowerCase();#}
+{#      const category = document.getElementById('product-category-filter').value.toLowerCase();#}
+{#      const rows = document.querySelectorAll('.product-row');#}
+{##}
+{#      rows.forEach(row => {#}
+{#        const title = row.getAttribute('data-title') || '';#}
+{#        const cat = row.getAttribute('data-category') || '';#}
+{#        const matchesQuery = !query || title.includes(query);#}
+{#        const matchesCat = !category || cat.toLowerCase() === category;#}
+{##}
+{#        if (matchesQuery && matchesCat) {#}
+{#          row.style.display = '';#}
+{#        } else {#}
+{#          row.style.display = 'none';#}
+{#        }#}
+{#      });#}
+{#    }#}
+{##}
+{#    // Live User Search & Filter#}
+{#    function filterUsers() {#}
+{#      const query = document.getElementById('user-search').value.toLowerCase();#}
+{#      const role = document.getElementById('user-role-filter').value.toLowerCase();#}
+{#      const rows = document.querySelectorAll('.user-row');#}
+{##}
+{#      rows.forEach(row => {#}
+{#        const name = row.getAttribute('data-name') || '';#}
+{#        const email = row.getAttribute('data-email') || '';#}
+{#        const userRole = row.getAttribute('data-role') || '';#}
+{##}
+{#        const matchesQuery = !query || name.includes(query) || email.includes(query);#}
+{#        const matchesRole = !role || userRole === role;#}
+{##}
+{#        if (matchesQuery && matchesRole) {#}
+{#          row.style.display = '';#}
+{#        } else {#}
+{#          row.style.display = 'none';#}
+{#        }#}
+{#      });#}
+{#    }#}
+{##}
+{#    // Dynamic Product Addition#}
+{#    function handleAddProductSubmit(e) {#}
+{#      e.preventDefault();#}
+{#      const title = document.getElementById('new-prod-title').value;#}
+{#      const price = parseFloat(document.getElementById('new-prod-price').value).toFixed(2);#}
+{#      const category = document.getElementById('new-prod-category').value;#}
+{#      const image = document.getElementById('new-prod-image').value || 'https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg';#}
+{##}
+{#      const tbody = document.getElementById('product-table-body');#}
+{#      const tr = document.createElement('tr');#}
+{#      const newId = Math.floor(Math.random() * 900) + 100;#}
+{#      tr.className = 'hover:bg-slate-800/40 transition product-row';#}
+{#      tr.setAttribute('data-title', title.toLowerCase());#}
+{#      tr.setAttribute('data-category', category.toLowerCase());#}
+{##}
+{#      tr.innerHTML = `#}
+{#        <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#          <img src="${image}" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm shrink-0">#}
+{#          <div class="max-w-xs">#}
+{#            <p class="font-medium text-white truncate text-xs">${title}</p>#}
+{#            <p class="text-[11px] text-slate-500 font-mono">ID: #${newId}</p>#}
+{#          </div>#}
+{#        </td>#}
+{#        <td class="py-3.5 px-4">#}
+{#          <span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700 capitalize">#}
+{#            ${category}#}
+{#          </span>#}
+{#        </td>#}
+{#        <td class="py-3.5 px-4">#}
+{#          <span class="font-semibold text-white">$${price}</span>#}
+{#        </td>#}
+{#        <td class="py-3.5 px-4">#}
+{#          <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">In Stock</span>#}
+{#        </td>#}
+{#        <td class="py-3.5 px-4 text-amber-400 font-medium">★ 5.0 <span class="text-slate-500 font-normal">(1)</span></td>#}
+{#        <td class="py-3.5 px-4 text-right space-x-2">#}
+{#          <button onclick="deleteProductRow(this)" class="p-1.5 text-slate-400 hover:text-rose-400">Delete</button>#}
+{#        </td>#}
+{#      `;#}
+{##}
+{#      tbody.prepend(tr);#}
+{#      closeModal('modal-add-product');#}
+{#      document.getElementById('form-add-product').reset();#}
+{#      showToast(`Product "${title}" added successfully!`);#}
+{#    }#}
+{##}
+{#    // Dynamic User Addition#}
+{#    function handleAddUserSubmit(e) {#}
+{#      e.preventDefault();#}
+{#      const name = document.getElementById('new-user-name').value;#}
+{#      const email = document.getElementById('new-user-email').value;#}
+{#      const role = document.getElementById('new-user-role').value;#}
+{#      const status = document.getElementById('new-user-status').value;#}
+{##}
+{#      const tbody = document.getElementById('user-table-body');#}
+{#      const tr = document.createElement('tr');#}
+{#      tr.className = 'hover:bg-slate-800/40 transition user-row';#}
+{#      tr.setAttribute('data-name', name.toLowerCase());#}
+{#      tr.setAttribute('data-email', email.toLowerCase());#}
+{#      tr.setAttribute('data-role', role.toLowerCase());#}
+{##}
+{#      const initial = name ? name[0].toUpperCase() : 'U';#}
+{#      const roleBadge = role === 'Admin' #}
+{#        ? '<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20">Admin</span>'#}
+{#        : '<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">Customer</span>';#}
+{##}
+{#      tr.innerHTML = `#}
+{#        <td class="py-3.5 px-4 flex items-center gap-3">#}
+{#          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-600 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">#}
+{#            ${initial}#}
+{#          </div>#}
+{#          <div>#}
+{#            <p class="font-semibold text-white">${name}</p>#}
+{#            <p class="text-[11px] text-slate-400">${email}</p>#}
+{#          </div>#}
+{#        </td>#}
+{#        <td class="py-3.5 px-4">${roleBadge}</td>#}
+{#        <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${status}</span></td>#}
+{#        <td class="py-3.5 px-4 text-slate-400">Jul 22, 2026</td>#}
+{#        <td class="py-3.5 px-4 text-right"><button onclick="deleteUserRow(this)" class="text-slate-400 hover:text-rose-400">Delete</button></td>#}
+{#      `;#}
+{##}
+{#      tbody.prepend(tr);#}
+{#      closeModal('modal-add-user');#}
+{#      document.getElementById('form-add-user').reset();#}
+{#      showToast(`User "${name}" created!`);#}
+{#    }#}
+{##}
+{#    // Row Delete Operations#}
+{#    function deleteProductRow(btn) {#}
+{#      if (confirm('Are you sure you want to delete this product?')) {#}
+{#        const row = btn.closest('tr');#}
+{#        row.remove();#}
+{#        showToast('Product removed', 'warning');#}
+{#      }#}
+{#    }#}
+{##}
+{#    function deleteUserRow(btn) {#}
+{#      if (confirm('Are you sure you want to delete this user?')) {#}
+{#        const row = btn.closest('tr');#}
+{#        row.remove();#}
+{#        showToast('User deleted', 'warning');#}
+{#      }#}
+{#    }#}
+{##}
+{#    // Global Top Search Handler#}
+{#    function handleGlobalSearch(query) {#}
+{#      if (!query) return;#}
+{#      const hash = window.location.hash.replace('#', '') || 'dashboard';#}
+{#      if (hash === 'products') {#}
+{#        document.getElementById('product-search').value = query;#}
+{#        filterProducts();#}
+{#      } else if (hash === 'users') {#}
+{#        document.getElementById('user-search').value = query;#}
+{#        filterUsers();#}
+{#      }#}
+{#    }#}
+{##}
+{#    // Initialize Charts & Hash Navigation#}
+{#    document.addEventListener('DOMContentLoaded', () => {#}
+{#      // Parse URL Hash#}
+{#      const hash = window.location.hash.replace('#', '');#}
+{#      if (['dashboard', 'products', 'users'].includes(hash)) {#}
+{#        switchTab(hash);#}
+{#      }#}
+{##}
+{#      // Initialize Revenue Line Chart#}
+{#      const ctxRev = document.getElementById('revenueChart').getContext('2d');#}
+{#      const gradient = ctxRev.createLinearGradient(0, 0, 0, 300);#}
+{#      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');#}
+{#      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');#}
+{##}
+{#      new Chart(ctxRev, {#}
+{#        type: 'line',#}
+{#        data: {#}
+{#          labels: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],#}
+{#          datasets: [{#}
+{#            label: 'Revenue ($)',#}
+{#            data: [18400, 24500, 31200, 29800, 42100, 48290],#}
+{#            borderColor: '#3b82f6',#}
+{#            borderWidth: 3,#}
+{#            backgroundColor: gradient,#}
+{#            fill: true,#}
+{#            tension: 0.4,#}
+{#            pointBackgroundColor: '#60a5fa',#}
+{#            pointRadius: 4#}
+{#          }]#}
+{#        },#}
+{#        options: {#}
+{#          responsive: true,#}
+{#          maintainAspectRatio: false,#}
+{#          plugins: {#}
+{#            legend: { display: false }#}
+{#          },#}
+{#          scales: {#}
+{#            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },#}
+{#            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } }#}
+{#          }#}
+{#        }#}
+{#      });#}
+{##}
+{#      // Initialize Category Doughnut Chart#}
+{#      const ctxCat = document.getElementById('categoryChart').getContext('2d');#}
+{#      new Chart(ctxCat, {#}
+{#        type: 'doughnut',#}
+{#        data: {#}
+{#          labels: ['Electronics', 'Men Clothing', 'Women Clothing', 'Jewelery'],#}
+{#          datasets: [{#}
+{#            data: [45, 25, 20, 10],#}
+{#            backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'],#}
+{#            borderWidth: 0#}
+{#          }]#}
+{#        },#}
+{#        options: {#}
+{#          responsive: true,#}
+{#          maintainAspectRatio: false,#}
+{#          plugins: {#}
+{#            legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 11 } } }#}
+{#          },#}
+{#          cutout: '72%'#}
+{#        }#}
+{#      });#}
+{#    });#}
+{#  </script>#}
+{#</body>#}
+{#</html>#}

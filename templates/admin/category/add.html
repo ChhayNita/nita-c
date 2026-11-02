@@ -36,12 +36,12 @@
         Category Image
       </label>
       <div class="p-4 rounded-xl border border-dashed border-slate-700 bg-slate-800/40 text-center hover:border-slate-600 transition">
-        <input type="file" name="image" id="category-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
-        <p class="text-[11px] text-slate-500 mt-2">Upload PNG, JPG, JPEG, WEBP</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="text-slate-500 text-[11px]">OR URL:</span>
-        <input type="url" name="image_url" placeholder="https://example.com/category.jpg" class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all">
+        <div id="image-preview-container" class="mb-3">
+          <p class="text-[11px] text-slate-400 mb-1.5">Preview (Default placeholder shown if no file selected):</p>
+          <img id="image-preview" src="https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png" alt="Category Preview" class="w-24 h-24 mx-auto object-cover rounded-xl border border-slate-600 shadow-md">
+        </div>
+        <input type="file" name="image" id="category-file" accept="image/*" onchange="previewCategoryImage(this)" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+        <p class="text-[11px] text-slate-500 mt-2">Upload PNG, JPG, JPEG, WEBP (Optional: default placeholder used if empty)</p>
       </div>
     </div>
 
@@ -60,4 +60,20 @@
     </div>
   </form>
 </div>
+
+<script>
+  const defaultPlaceholder = "https://arthurmillerfoundation.org/wp-content/uploads/2018/06/default-placeholder.png";
+  function previewCategoryImage(input) {
+    const preview = document.getElementById('image-preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = defaultPlaceholder;
+    }
+  }
+</script>
 {% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'admin/master.html' %}
+
+{% block content %}
+<!-- Page Header with Back Navigation & Action Buttons -->
+<div class="flex items-center justify-between">
+  <div>
+    <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
+      <a href="{{ url_for('admin.admin_orders') }}" class="hover:text-white transition">Orders</a>
+      <span>/</span>
+      <span class="text-blue-400 font-medium font-mono">#{{ order.order_number }}</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <h2 class="text-xl font-bold text-white tracking-tight">Order #{{ order.order_number }}</h2>
+      <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold
+        {% if order.order_status == 'Completed' %}bg-emerald-500/15 text-emerald-400 border border-emerald-500/30
+        {% elif order.order_status == 'Ready for Pickup' %}bg-amber-500/15 text-amber-400 border border-amber-500/30
+        {% elif order.order_status == 'Delivered' %}bg-indigo-500/15 text-indigo-400 border border-indigo-500/30
+        {% elif order.order_status == 'Processing' %}bg-blue-500/15 text-blue-400 border border-blue-500/30
+        {% else %}bg-slate-700 text-slate-300{% endif %}">
+        {{ order.order_status }}
+      </span>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2.5">
+    <button type="button" onclick="window.print()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+      <span>Print Receipt</span>
+    </button>
+    <a href="{{ url_for('admin.admin_orders') }}" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-700 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      <span>Back</span>
+    </a>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left 2 Cols: Order Items & Summary -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Products In Order Card -->
+    <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-4">
+      <h3 class="text-sm font-bold text-white uppercase tracking-wider">Ordered Products ({{ order.items|length }})</h3>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 font-semibold">
+              <th class="py-2.5 px-3">Item</th>
+              <th class="py-2.5 px-3 text-center">Unit Price</th>
+              <th class="py-2.5 px-3 text-center">Qty</th>
+              <th class="py-2.5 px-3 text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 text-slate-300">
+            {% for item in order.items %}
+            <tr>
+              <td class="py-3 px-3 flex items-center gap-3">
+                {% if item.product and item.product.thumbnail %}
+                  <img src="{{ item.product.thumbnail }}" alt="{{ item.product_name }}" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shrink-0">
+                {% else %}
+                  <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-500 shrink-0 text-[10px]">
+                    Item
+                  </div>
+                {% endif %}
+                <div>
+                  <p class="font-semibold text-white">{{ item.product_name }}</p>
+                  {% if item.product_id %}
+                    <a href="{{ url_for('admin.admin_product_edit', product_id=item.product_id) }}" class="text-[11px] text-blue-400 hover:underline">View Product #{{ item.product_id }}</a>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="py-3 px-3 text-center font-mono">${{ "%.2f"|format(item.product_price) }}</td>
+              <td class="py-3 px-3 text-center font-semibold text-white">{{ item.quantity }}</td>
+              <td class="py-3 px-3 text-right font-mono font-bold text-white">${{ "%.2f"|format(item.subtotal) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr class="border-t border-slate-700 font-bold text-sm text-white">
+              <td colspan="3" class="py-3 px-3 text-right">Grand Total:</td>
+              <td class="py-3 px-3 text-right text-blue-400 font-mono">${{ "%.2f"|format(order.total_amount) }} {{ order.currency }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payment & Bakong Info Card -->
+    <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-4">
+      <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+        <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        <span>Payment & Bakong KHQR Information</span>
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div class="p-3.5 bg-slate-800/60 rounded-xl border border-slate-700 space-y-1">
+          <p class="text-slate-400">Payment Method:</p>
+          <p class="text-white font-bold uppercase">{{ order.payment_method }}</p>
+        </div>
+        <div class="p-3.5 bg-slate-800/60 rounded-xl border border-slate-700 space-y-1">
+          <p class="text-slate-400">Payment Status:</p>
+          <p class="{% if order.payment_status == 'Paid' %}text-emerald-400{% else %}text-amber-400{% endif %} font-bold">
+            ● {{ order.payment_status }}
+          </p>
+        </div>
+        {% if order.bakong_md5 %}
+        <div class="p-3.5 bg-slate-800/60 rounded-xl border border-slate-700 sm:col-span-2 space-y-1">
+          <p class="text-slate-400">Bakong Transaction MD5 Hash:</p>
+          <p class="font-mono text-rose-300 break-all select-all">{{ order.bakong_md5 }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right 1 Col: Customer & Status Controls -->
+  <div class="space-y-6">
+    <!-- Status Control Box -->
+    <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-4">
+      <h3 class="text-sm font-bold text-white uppercase tracking-wider">Update Order Status</h3>
+      
+      <form action="{{ url_for('admin.admin_order_update_status', order_id=order.id) }}" method="POST" class="space-y-4 text-xs">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div>
+          <label class="block text-slate-400 mb-1 font-semibold">Order Fulfillment Status</label>
+          <select name="order_status" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500">
+            <option value="Processing" {% if order.order_status == 'Processing' %}selected{% endif %}>Processing</option>
+            <option value="Ready for Pickup" {% if order.order_status == 'Ready for Pickup' %}selected{% endif %}>Ready for Pickup</option>
+            <option value="Delivered" {% if order.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+            <option value="Completed" {% if order.order_status == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Cancelled" {% if order.order_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1 font-semibold">Payment Status</label>
+          <select name="payment_status" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500">
+            <option value="Paid" {% if order.payment_status == 'Paid' %}selected{% endif %}>Paid</option>
+            <option value="Pending" {% if order.payment_status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Failed" {% if order.payment_status == 'Failed' %}selected{% endif %}>Failed</option>
+          </select>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-white transition shadow-md shadow-blue-500/20">
+          Save Status Updates
+        </button>
+      </form>
+    </div>
+
+    <!-- Customer Information Card -->
+    <div class="p-6 rounded-2xl glass-panel border border-slate-800 shadow-xl space-y-4">
+      <h3 class="text-sm font-bold text-white uppercase tracking-wider">Customer Details</h3>
+      <div class="space-y-3 text-xs">
+        <div>
+          <p class="text-slate-400 text-[11px]">Full Name</p>
+          <p class="font-semibold text-white text-sm">{{ order.customer_name }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400 text-[11px]">Phone Number</p>
+          <a href="tel:{{ order.customer_phone }}" class="font-mono text-emerald-400 hover:underline">{{ order.customer_phone }}</a>
+        </div>
+        <div>
+          <p class="text-slate-400 text-[11px]">Email</p>
+          <p class="text-slate-200">{{ order.customer_email or 'Not provided' }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400 text-[11px]">Fulfillment Type</p>
+          <p class="font-semibold text-white uppercase">{{ order.delivery_type }}</p>
+        </div>
+        {% if order.delivery_type == 'delivery' %}
+        <div>
+          <p class="text-slate-400 text-[11px]">Delivery Address</p>
+          <p class="text-slate-200 bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80 whitespace-pre-wrap">{{ order.shipping_address or 'No address specified' }}</p>
+        </div>
+        {% else %}
+        <div>
+          <p class="text-slate-400 text-[11px]">Pickup Location</p>
+          <p class="text-amber-300 bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80">SV7 Store Main Branch (Phnom Penh)</p>
+        </div>
+        {% endif %}
+        {% if order.notes %}
+        <div>
+          <p class="text-slate-400 text-[11px]">Order Notes</p>
+          <p class="text-slate-300 italic bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/60">{{ order.notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
